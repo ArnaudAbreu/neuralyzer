@@ -1,7 +1,7 @@
 # coding: utf8
 
-from neuralyzer.data.wsi2hevpred import predict_slides
-from neuralyzer.model import CLF, SiameseCLF
+from neuralyzer.data.wsi2pred import predict_slides
+from neuralyzer.model import CLF
 from neuralyzer.archi import Classifier
 from tqdm import tqdm
 import numpy
@@ -14,7 +14,7 @@ import pickle
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--slidedir",
-                    help="absolute path to the training directory")
+                    help="absolute path to the directory to predict")
 
 parser.add_argument("--device", default="0",
                     help="device to use for computation")
@@ -25,6 +25,9 @@ parser.add_argument("--basenet",
 parser.add_argument("--outfolder",
                     help="output folder for trained network")
 
+parser.add_argument("--predlevel", type=int, default=5,
+                    help="pyramid level for patch prediction")
+
 args = parser.parse_args()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -33,6 +36,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.device
 ref_path = args.basenet
 outfolder = args.outfolder
 slidedir = args.slidedir
+predlevel = args.predlevel
 
 h = 125
 w = 125
@@ -59,6 +63,6 @@ if not os.path.isdir(outputdir):
     os.makedirs(outputdir)
 
 # predict slides
-predict_slides(clf, slidedir, outputdir, prediction_level=5, n_classes=2)
+predict_slides(clf, slidedir, outputdir, prediction_level=predlevel, n_classes=2)
 
 clf.close()
