@@ -1,11 +1,11 @@
 # coding: utf8
 
-from ..data import HEVGenerator as hevgen
-from ..model import CLF
-from ..archi import Classifier
+from neuralyzer.data import HEVGenerator as hevgen
+from neuralyzer.model import CLF
+from neuralyzer.archi import Classifier
 from tqdm import tqdm
 import numpy
-from ..render import monitor
+from neuralyzer.render import monitor
 import argparse
 import os
 import pickle

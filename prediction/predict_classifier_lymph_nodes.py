@@ -1,11 +1,11 @@
 # coding: utf8
 
-from ..data.wsi2pred import predict_slides
-from ..model import CLF
-from ..archi import Classifier
+from neuralyzer.data.wsi2pred import predict_slides
+from neuralyzer.model import CLF
+from neuralyzer.archi import Classifier
 from tqdm import tqdm
 import numpy
-from ..render import monitor
+from neuralyzer.render import monitor
 import argparse
 import os
 import pickle
