@@ -1,6 +1,6 @@
 # coding: utf8
 
-from neuralyzer.data import HEVGenerator as hevgen
+from neuralyzer.data import FolderGenerator as foldgen
 from neuralyzer.model import CLF
 from neuralyzer.archi import Classifier
 from tqdm import tqdm
@@ -10,7 +10,7 @@ import argparse
 import os
 import pickle
 
-# this file is a test for all functionalities of the deep ensemble
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--trainfolder",
                     help="absolute path to the training directory")
@@ -48,8 +48,8 @@ opt = args.opt
 lr = args.lr
 outfolder = args.outfolder
 
-train_data = hevgen(train_folder, batchsize)
-valid_data = hevgen(valid_folder, batchsize)
+train_data = foldgen(train_folder, batchsize)
+valid_data = foldgen(valid_folder, batchsize)
 
 h = 125
 w = 125

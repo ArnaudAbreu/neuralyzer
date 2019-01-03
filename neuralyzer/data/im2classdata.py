@@ -89,9 +89,9 @@ class Cifar10Generator:
             yield x, y
 
 
-class HEVGenerator:
+class FolderGenerator:
 
-    def __init__(self, directory, batchsize, norm=True):
+    def __init__(self, directory, batchsize, norm=True, size=(125, 125)):
 
         # assume class have same number of samples
         # i.e. same number of images in each directory
@@ -104,7 +104,7 @@ class HEVGenerator:
         self.steps /= batchsize
         self.steps = int(self.steps)
         self.imgenobject = ImageDataGenerator()
-        self.gen = self.imgenobject.flow_from_directory(directory, target_size=(125, 125), batch_size=batchsize)
+        self.gen = self.imgenobject.flow_from_directory(directory, target_size=size, batch_size=batchsize)
         self.norm = norm
 
     def __iter__(self):

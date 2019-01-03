@@ -1,6 +1,6 @@
 # coding: utf8
 
-from neuralyzer.data import HEVGenerator as hevgen
+from neuralyzer.data import FolderGenerator as foldgen
 from neuralyzer.model import CLF
 from neuralyzer.archi import Classifier
 from tqdm import tqdm
@@ -57,8 +57,8 @@ h = args.patchsize
 w = args.patchsize
 c = args.inputchannels
 
-train_data = hevgen(train_folder, batchsize)
-valid_data = hevgen(valid_folder, batchsize)
+train_data = foldgen(train_folder, batchsize, size=(h, w))
+valid_data = foldgen(valid_folder, batchsize, size=(h, w))
 
 
 archi = Classifier(brickname='reference',

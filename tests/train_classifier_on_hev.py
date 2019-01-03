@@ -1,6 +1,6 @@
 # coding: utf8
 
-from neuralyzer.data import HEVGenerator as hevgen
+from neuralyzer.data import FolderGenerator as hevgen
 from neuralyzer.model import CLF
 from neuralyzer.archi import Classifier
 from tqdm import tqdm
