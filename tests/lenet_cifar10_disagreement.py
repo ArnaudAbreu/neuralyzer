@@ -67,7 +67,7 @@ preddiff = numpy.equal(predrefclass, preddepclass)
 
 preddiff = numpy.logical_not(preddiff)
 
-disagreement = xtest[preddiff]
+disagreement = xtest[preddiff == 1]
 
 with open(os.path.join(outfolder, 'disagreement.p'), 'wb') as f:
     pickle.dump(disagreement, f)
