@@ -13,8 +13,8 @@ import pickle
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--slidedir",
-                    help="absolute path to the directory to predict")
+parser.add_argument("--labpathfile",
+                    help="absolute path to a labpathfile produced by train-test split procedure")
 
 parser.add_argument("--device", default="0",
                     help="device to use for computation")
@@ -44,13 +44,16 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.device
 
 ref_path = args.basenet
 outfolder = args.outfolder
-slidedir = args.slidedir
+labpathfile = args.labpathfile
 patch_level = args.predlevel
 interval = args.patchinter
 
 h = args.patchsize
 w = args.patchsize
 c = args.inputchannels
+
+with open(labpathfile, 'rb') as f:
+    labpathlist = pickle.load(f)
 
 
 refarchi = Classifier(brickname='reference',
@@ -74,6 +77,7 @@ if not os.path.isdir(outputdir):
 
 # predict slides
 # predict_slides(clf, slidedir, outputdir, prediction_level=predlevel, n_classes=2)
-predict_slidesV2(clf, slidedir, outputdir, patch_level, interval, w, h)
+# predict_slides_from_dir(clf, slidedir, outputdir, patch_level, interval, w, h)
+predict_slides_from_labpathlist(clf, labpathlist, outputdir, patch_level, interval, w, h)
 
 clf.close()

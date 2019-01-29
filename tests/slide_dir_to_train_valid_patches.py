@@ -6,6 +6,7 @@ import argparse
 import os
 from tqdm import tqdm
 import numpy
+import pickle
 
 parser = argparse.ArgumentParser()
 
@@ -41,6 +42,9 @@ slidenames = numpy.array(slidenames)
 
 numpy.random.shuffle(slidenames)
 
+labpathlistfolder = os.path.join(args.outfolder, '..')
+labpathlist = []
+
 trainfolder = os.path.join(args.outfolder, 'Train')
 trainfolder = os.path.join(trainfolder, args.classname)
 
@@ -69,8 +73,13 @@ print('start test patchification:')
 
 for slidename in tqdm(slidenames[stopidx::]):
 
+    labpathlist.append((os.path.join(args.infolder, slidename), args.classname))
     slide = OpenSlide(os.path.join(args.infolder, slidename))
     prefix = os.path.splitext(slidename)[0]
     prefix = os.path.join(testfolder, prefix)
 
     patch.patchify(slide, args.level, args.interval, args.sizex, args.sizey, prefix)
+
+
+with open(os.path.join(labpathlistfolder, 'labpathlist.p'), 'wb') as f:
+    pickle.dump(labpathlist, f)
