@@ -252,8 +252,10 @@ def patchify(slide, patch_level, interval, x_size, y_size, prefix):
 
         image = numpy.array(slide.read_region((startx, starty), patch_level, (x_size, y_size)))
 
-        name = prefix + "_" + str(x) + "_" + str(y) + ".png"
+        if not is_low_contrast(image[:, :, 0:3]):
 
-        outpath = os.path.join(prefix, name)
+            name = prefix + "_" + str(x) + "_" + str(y) + ".png"
 
-        imsave(outpath, image[:, :, 0:3])
+            outpath = os.path.join(prefix, name)
+
+            imsave(outpath, image[:, :, 0:3])
