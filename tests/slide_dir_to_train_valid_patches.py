@@ -7,7 +7,6 @@ import os
 from tqdm import tqdm
 import numpy
 
-# this file is a test for all functionalities of the deep ensemble
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--level", type=int, default=5,

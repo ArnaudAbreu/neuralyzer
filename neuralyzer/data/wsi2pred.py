@@ -3,6 +3,7 @@ import pickle
 import os
 from skimage.io import imsave
 from tqdm import trange, tqdm
+from .patch import patches_in_slide
 
 
 def predict_slides(my_model, slidedir, outputdir, maxfiles=None, prediction_level=2, h_input=125, w_input=125, rescale=(1. / 255.), offsets=[(0, 0)], n_classes=3):
@@ -102,3 +103,70 @@ def predict_slides(my_model, slidedir, outputdir, maxfiles=None, prediction_leve
                 result = numpy.around(result)
                 result[result > 255] = 255
                 imsave(os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction_" + str(offsetx) + "_" + str(offsety) + ".tiff"), result)
+
+
+def predict_slidesV2(my_model, slidedir, outputdir, patch_level, interval, x_size, y_size, maxfiles=None):
+
+    """
+    Same function as above, take a slide dir and predict every tile of every
+    slide in that dir. It put every results in an outputdir.
+    This function takes advantage of the slight code written in the module patch.
+
+    Arguments:
+        - my_model: classifier, object with a predict function that works on
+        RGB-images.
+        - slidedir: str, absolute path to slide directory.
+        - outputdir: str, absolute path to output directory.
+        - patch_level: int, level to extract patches, 0 = highest resolution.
+        - interval: int, number of pixels between two samples given at patch level.
+        - x_size: int, number of pixels of sample on x axis, given at patch level.
+        - y_size: int, number of pixels of sample on y axis given at patch level.
+        - maxfiles: int, file number limit, if None, no limit, default is None.
+
+    Returns:
+        - nothing, just store results of each slide in a file located in outputdir.
+    """
+
+    from openslide import OpenSlide
+
+    slidepaths = [os.path.join(slidedir, f) for f in os.listdir(slidedir) if f[0] != '.' and '.mrxs' in f]
+
+    if maxfiles is not None:
+        slidepaths = slidepaths[0:maxfiles]
+
+    k = 0
+
+    # for each slide
+    for path in slidepaths:
+
+        k += 1
+
+        # inform user
+        print('#' * 20)
+        print('Processing file: ', path)
+        print('progression : ', (k / len(slidepaths)) * 100, '%')
+        print('#' * 20)
+
+        slide = OpenSlide(path)
+        outputdata = []
+        images = []
+
+        for image, patch_level, absx, absy, absizex, absizey in patches_in_slide(slide, patch_level, interval, x_size, y_size, detailed=True):
+
+            outputdata.append({'patchlevel': patch_level,
+                               'absx': absx,
+                               'absy': absy,
+                               'absizex': absizex,
+                               'absizey': absizey})
+            images.append(image.astype(float) / 255.)
+
+        preds = my_model.predict(images)
+
+        for n in range(len(outputdata)):
+
+            outputdata[n]['prediction'] = preds[n]
+
+        outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
+
+        with open(outfile, 'wb') as f:
+            pickle.dump(outputdata, f)

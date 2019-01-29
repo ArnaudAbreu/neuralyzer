@@ -136,7 +136,7 @@ def regular_grid_regular_seeds(imshape, interval):
     return regular_seeds(imshape, n_seeds)
 
 
-def patches_in_slide(slide, patch_level, interval, x_size, y_size):
+def patches_in_slide(slide, patch_level, interval, x_size, y_size, detailed=False):
 
     """
     Given a slide, a level to extract patches, sampling intervals, sample sizes,
@@ -148,6 +148,7 @@ def patches_in_slide(slide, patch_level, interval, x_size, y_size):
         - interval: int, number of pixels between two samples given at patch level.
         - x_size: int, number of pixels of sample on x axis, given at patch level.
         - y_size: int, number of pixels of sample on y axis given at patch level.
+        - detailed: bool, whether to return position and size of patch in wsi.
 
     Yields:
         - image: RGB numpy array.
@@ -186,7 +187,10 @@ def patches_in_slide(slide, patch_level, interval, x_size, y_size):
 
         image = numpy.array(slide.read_region((startx, starty), patch_level, (x_size, y_size)))
 
-        yield image[:, :, 0:3]
+        if detailed:
+            yield image[:, :, 0:3], patch_level, absx, absy, absizex, absizey
+        else:
+            yield image[:, :, 0:3]
 
 
 def patchify(slide, patch_level, interval, x_size, y_size, prefix):

@@ -1,6 +1,6 @@
 # coding: utf8
 
-from neuralyzer.data.wsi2pred import predict_slides
+from neuralyzer.data.wsi2pred import predict_slides, predict_slidesV2
 from neuralyzer.model import CLF
 from neuralyzer.archi import Classifier
 from tqdm import tqdm
@@ -31,6 +31,9 @@ parser.add_argument("--predlevel", type=int, default=5,
 parser.add_argument("--patchsize", type=int, default=125,
                     help="int, size of patches in pixels")
 
+parser.add_argument("--patchinter", type=int, default=125,
+                    help="int, interval between patches in pixels")
+
 parser.add_argument("--inputchannels", type=int, default=3,
                     help="int, number of input channels")
 
@@ -42,7 +45,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.device
 ref_path = args.basenet
 outfolder = args.outfolder
 slidedir = args.slidedir
-predlevel = args.predlevel
+patch_level = args.predlevel
+interval = args.patchinter
 
 h = args.patchsize
 w = args.patchsize
@@ -69,6 +73,7 @@ if not os.path.isdir(outputdir):
     os.makedirs(outputdir)
 
 # predict slides
-predict_slides(clf, slidedir, outputdir, prediction_level=predlevel, n_classes=2)
+# predict_slides(clf, slidedir, outputdir, prediction_level=predlevel, n_classes=2)
+predict_slidesV2(clf, slidedir, outputdir, patch_level, interval, w, h)
 
 clf.close()
