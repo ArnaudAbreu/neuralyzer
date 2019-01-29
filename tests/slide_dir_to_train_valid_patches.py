@@ -43,7 +43,16 @@ slidenames = numpy.array(slidenames)
 numpy.random.shuffle(slidenames)
 
 labpathlistfolder = os.path.join(args.outfolder, '..')
-labpathlist = []
+labpathlistfile = os.path.join(labpathlistfolder, 'labpathlist.p')
+
+if os.path.exists(labpathlistfile):
+
+    with open(labpathlistfile, 'rb') as f:
+        labpathlist = pickle.load(f)
+
+    if args.classname in [elem[1] for elem in labpathlist]:
+        # erase if already contains current class testfiles (too old)
+        labpathlist = []
 
 trainfolder = os.path.join(args.outfolder, 'Train')
 trainfolder = os.path.join(trainfolder, args.classname)
@@ -81,5 +90,5 @@ for slidename in tqdm(slidenames[stopidx::]):
     patch.patchify(slide, args.level, args.interval, args.sizex, args.sizey, prefix)
 
 
-with open(os.path.join(labpathlistfolder, 'labpathlist.p'), 'wb') as f:
+with open(labpathlistfile, 'wb') as f:
     pickle.dump(labpathlist, f)
