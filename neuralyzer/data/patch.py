@@ -2,6 +2,7 @@
 import numpy
 from skimage.util import regular_seeds
 from skimage.io import imsave
+from skimage.exposure import is_low_contrast
 import os
 from tqdm import tqdm
 
@@ -187,10 +188,15 @@ def patches_in_slide(slide, patch_level, interval, x_size, y_size, detailed=Fals
 
         image = numpy.array(slide.read_region((startx, starty), patch_level, (x_size, y_size)))
 
-        if detailed:
-            yield image[:, :, 0:3], patch_level, absx, absy, absizex, absizey
-        else:
-            yield image[:, :, 0:3]
+        # still have to check whether is_low_contrast(image) because white and black elimination
+        # was performed at lower resolution, forgotten areas might remain.
+
+        if not is_low_contrast(image[:, :, 0:3]):
+
+            if detailed:
+                yield image[:, :, 0:3], patch_level, absx, absy, absizex, absizey
+            else:
+                yield image[:, :, 0:3]
 
 
 def patchify(slide, patch_level, interval, x_size, y_size, prefix):
