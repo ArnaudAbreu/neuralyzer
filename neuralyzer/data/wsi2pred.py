@@ -209,7 +209,7 @@ def predict_slides_from_labpathlist(my_model, labpathlist, outputdir, patch_leve
         # inform user
         print('#' * 20)
         print('Processing file: ', path)
-        print('progression : ', (k / len(pathlist)) * 100, '%')
+        print('progression : ', (k / len(labpathlist)) * 100, '%')
         print('#' * 20)
 
         slide = OpenSlide(path)
