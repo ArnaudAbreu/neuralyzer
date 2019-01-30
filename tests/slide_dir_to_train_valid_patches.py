@@ -53,6 +53,8 @@ if os.path.exists(labpathlistfile):
     if args.classname in [elem[1] for elem in labpathlist]:
         # erase if already contains current class testfiles (too old)
         labpathlist = []
+else:
+    labpathlist = []
 
 trainfolder = os.path.join(args.outfolder, 'Train')
 trainfolder = os.path.join(trainfolder, args.classname)
