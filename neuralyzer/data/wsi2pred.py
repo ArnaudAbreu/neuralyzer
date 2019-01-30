@@ -164,7 +164,7 @@ def predict_slides_from_dir(my_model, slidedir, outputdir, patch_level, interval
 
         for n in range(len(outputdata)):
 
-            outputdata[n]['prediction'] = preds[n]
+            outputdata[n]['prediction'] = preds[0][n]
 
         outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
 
@@ -226,11 +226,11 @@ def predict_slides_from_labpathlist(my_model, labpathlist, outputdir, patch_leve
                                'groundtruth': lab})
             images.append(image.astype(float) / 255.)
 
-        preds = my_model.predict(images)
+        preds = my_model.predict(numpy.asarray(images))
 
         for n in range(len(outputdata)):
 
-            outputdata[n]['prediction'] = preds[n]
+            outputdata[n]['prediction'] = preds[0][n]
 
         outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
 
