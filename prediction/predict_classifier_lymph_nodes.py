@@ -1,6 +1,6 @@
 # coding: utf8
 
-from neuralyzer.data.wsi2pred import predict_slides, predict_slidesV2
+from neuralyzer.data.wsi2pred import predict_slides, predict_slides_from_labpathlist
 from neuralyzer.model import CLF
 from neuralyzer.archi import Classifier
 from tqdm import tqdm
