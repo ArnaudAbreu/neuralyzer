@@ -105,6 +105,7 @@ def get_reasonable_level(slide):
 
     level_dimensions = list(slide.level_dimensions)
     k = 0
+    # level dimensions are listed in decreasing order.
 
     for di, dj in level_dimensions:
 
