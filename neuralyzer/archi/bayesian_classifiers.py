@@ -67,9 +67,10 @@ class BayesianClassifier(Brick):
 
     def __call__(self, arg_tensor):
 
-        Brick.__call__(self, arg_tensor)
+        result = Brick.__call__(self, arg_tensor)
         for layer in self.ops:
             self.losses += layer.losses
+        return result
 
     def transfer(self, other_clf):
 
