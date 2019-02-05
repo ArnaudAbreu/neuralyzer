@@ -53,7 +53,7 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                                fcdropouts=[0.5, 0.5],
                                conv_activations=['relu', 'relu', 'relu'],
                                fc_activations=['relu', 'relu'],
-                               end_activation='softmax',
+                               end_activation=None,
                                output_channels=2)
 
     clf = CLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
