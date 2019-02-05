@@ -1,5 +1,5 @@
 # coding: utf8
-from .data import patch
+from .patch import patchify
 from openslide import OpenSlide
 
 import argparse
