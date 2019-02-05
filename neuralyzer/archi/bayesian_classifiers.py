@@ -47,7 +47,7 @@ class BayesianClassifier(Brick):
             # self.ops.append(Dropout(rate=opdropout, name=dropname))
 
         # Before applying fully connected layers, I have to flatten
-        self.ops.append(Flatten())
+        self.ops.append(tf.layers.Flatten())
 
         for depth in range(len(fc)):
 
