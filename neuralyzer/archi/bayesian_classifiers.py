@@ -42,7 +42,7 @@ class BayesianClassifier(Brick):
                                                             activation=opac,
                                                             padding='same',
                                                             name=opname))
-            self.ops.append(MaxPooling2D(pool_size=(2, 2), name="pool"))
+            self.ops.append(tf.layers.MaxPooling2D(pool_size=(2, 2), name="pool"))
             # Dropout is not necessary with bayesian networks (not supposed to over-fit)
             # self.ops.append(Dropout(rate=opdropout, name=dropname))
 
