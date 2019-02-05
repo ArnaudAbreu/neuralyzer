@@ -61,7 +61,7 @@ def generate_class(infolder, outfolder, classname, trainratio, level, sizex, siz
         prefix = os.path.splitext(slidename)[0]
         prefix = os.path.join(trainfolder, prefix)
 
-        patch.patchify(slide, level, interval, sizex, sizey, prefix)
+        patchify(slide, level, interval, sizex, sizey, prefix)
 
     print('start test patchification:')
 
@@ -72,7 +72,7 @@ def generate_class(infolder, outfolder, classname, trainratio, level, sizex, siz
         prefix = os.path.splitext(slidename)[0]
         prefix = os.path.join(testfolder, prefix)
 
-        patch.patchify(slide, level, interval, sizex, sizey, prefix)
+        patchify(slide, level, interval, sizex, sizey, prefix)
 
 
 def generate(infolder, outfolder, trainratio, level, sizex, sizey, interval):
