@@ -1,8 +1,8 @@
 # coding: utf8
 
 from ..data.wsi2pred import predict_slides, predict_slides_from_labpathlist
-from ..model import CLF
-from ..archi import Classifier
+from ..model import BCLF
+from ..archi import Classifier, BayesianClassifier
 from ..render import monitor
 from tqdm import tqdm
 import numpy
@@ -56,7 +56,7 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                                end_activation=None,
                                output_channels=2)
 
-    clf = CLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
+    clf = BCLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
 
     outputdir = os.path.join(outfolder, 'slides_prediction')
 
