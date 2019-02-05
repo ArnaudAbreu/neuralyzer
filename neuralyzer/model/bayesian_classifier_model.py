@@ -56,11 +56,11 @@ class BCLF(Model):
             self.optimizer = tf.train.RMSPropOptimizer(self.lr)
 
         # training procedures
-        self.training = self.optimizer.minimize(self.loss, var_list=self.lenet.trainable_weights)
+        self.training = self.optimizer.minimize(self.loss, var_list=self.bayesianlenet.trainable_weights)
 
         # At the end do what all models do with computation graph
         # computation graph
-        self.saver = tf.train.Saver(var_list=self.lenet.trainable_weights)
+        self.saver = tf.train.Saver(var_list=self.bayesianlenet.trainable_weights)
         self.sess = tf.Session()
         # graph initialization
         # case where we update a previous graph
@@ -116,11 +116,11 @@ class BCLF(Model):
 
         description = '\narchitecture details\n'
         description += ('*' * len('architecture details') + '\n')
-        description += (self.lenet.__str__() + '\n')
+        description += (self.bayesianlenet.__str__() + '\n')
 
         description += '\ntrainable weights\n'
         description += ('*' * len('trainable weights') + '\n')
-        for w in self.lenet.trainable_weights:
+        for w in self.bayesianlenet.trainable_weights:
             description += (str(w) + '\n')
         description += ('-' * len('trainable weights') + '\n')
 
