@@ -32,16 +32,11 @@ class BCLF(Model):
         self.bayesianlenet = clf
 
         # tensors for objectives
+
+        # tensors for objectives
         self.Y_pred = self.bayesianlenet(self.X)
 
         self.Y_predcat = tf.cast(tf.argmax(self.Y_pred, axis=1, name='predictedclasses'), tf.int32)
-        self.Y_cat = tf.cast(tf.argmax(self.Y, axis=1, name='classes'), tf.int32)
-        self.labels_distributions = tfd.Categorical(logits=self.Y_pred)
-
-        # tensors for objectives
-        self.Y_pred = self.lenet(self.X)
-
-        self.Y_predcat = tf.cast(tf.argmax(self.Y_pred, axis=1, name='classes'), tf.int32)
         self.Y_cat = tf.cast(tf.argmax(self.Y, axis=1, name='classes'), tf.int32)
 
         # objectives
