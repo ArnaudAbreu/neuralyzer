@@ -100,7 +100,7 @@ def generate(infolder, outfolder, trainratio, level, sizex, sizey, interval):
 
     hf_infolder = os.path.join(infolder, 'HF')
     lf_infolder = os.path.join(infolder, 'LF')
-    labpathlistfolder = os.path.join(args.outfolder, '..')
+    labpathlistfolder = os.path.join(outfolder, '..')
     labpathlistfile = os.path.join(labpathlistfolder, 'labpathlist.p')
 
     labpathlist = []
