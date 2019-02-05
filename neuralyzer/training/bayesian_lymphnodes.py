@@ -76,10 +76,10 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
 
         for x, y in trainprogressbar:
 
-            lval, accval = clf.fit(x, y)
+            lval, klval, accval = clf.fit(x, y)
             trainlvals.append(lval)
             trainaccvals.append(accval)
-            metrics = [('loss', numpy.mean(trainlvals)), ('acc', numpy.mean(trainaccvals))]
+            metrics = [('loss', numpy.mean(trainlvals)), ('kl', klval), ('acc', numpy.mean(trainaccvals))]
             desc = monitor(metrics, 4)
             trainprogressbar.set_description(desc=desc, refresh=True)
 
