@@ -36,16 +36,13 @@ class BCLF(Model):
         # tensors for objectives
         self.Y_pred = self.bayesianlenet(self.X)
 
-        self.Y_predcat = tf.cast(tf.argmax(self.Y_pred, axis=1, name='predictedclasses'), tf.int32)
+        self.Y_predcat = tf.cast(tf.argmax(self.Y_pred, axis=1, name='classes'), tf.int32)
         self.Y_cat = tf.cast(tf.argmax(self.Y, axis=1, name='classes'), tf.int32)
 
         # objectives
         self.fY = tf.cast(self.Y, tf.float32)
-        self.neg_log_likelyhood = tf.reduce_mean(tf.keras.backend.categorical_crossentropy(self.fY, self.Y_pred, from_logits=False))
-        # self.kl = sum(self.bayesianlenet.losses) / tf.cast(tf.shape(self.Y)[0], tf.float32)
-        self.kl = tf.reduce_mean(self.bayesianlenet.losses)
+        self.loss = tf.reduce_mean(tf.keras.backend.categorical_crossentropy(self.fY, self.Y_pred, from_logits=False))
         # self.loss = - tf.reduce_mean(self.fY * tf.log(self.Y_pred + 1e-10) + (1. - self.fY) * tf.log((1. - self.Y_pred) + 1e-10))
-        self.loss = self.neg_log_likelyhood
         self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.Y_predcat, self.Y_cat), tf.float32))
 
         # optimization
