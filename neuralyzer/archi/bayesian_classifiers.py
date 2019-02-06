@@ -63,14 +63,11 @@ class BayesianClassifier(Brick):
         self.ops.append(tfp.layers.DenseFlipout(output_channels,
                                                 activation=end_activation,
                                                 name='final_fc'))
-        self.losses = []
+        self.kerasmodel = tf.keras.Sequential(self.ops)
 
     def __call__(self, arg_tensor):
 
-        result = Brick.__call__(self, arg_tensor)
-        for layer in self.ops:
-            self.losses += layer.losses
-        return result
+        Brick.__call__(self, arg_tensor)
 
     def transfer(self, other_clf):
 
