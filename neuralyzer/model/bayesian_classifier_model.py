@@ -80,8 +80,9 @@ class BCLF(Model):
         # In the original ne_ne implementation, no return statement.
         # I changed it to be clearer (my point of view...)
         feed_dict = {self.X: x, self.Y: y, K.learning_phase(): 1}
-        _, negloglikelyhood, kldiv, accuracyval = self.sess.run([self.training, self.neg_log_likelyhood, self.kl, self.accuracy], feed_dict=feed_dict)
-        return negloglikelyhood, kldiv, accuracyval
+        # _, negloglikelyhood, kldiv, accuracyval = self.sess.run([self.training, self.neg_log_likelyhood, self.kl, self.accuracy], feed_dict=feed_dict)
+        _, negloglikelyhood, accuracyval = self.sess.run([self.training, self.loss, self.accuracy], feed_dict=feed_dict)
+        return negloglikelyhood, accuracyval
 
     def validate(self, x, y):
 
