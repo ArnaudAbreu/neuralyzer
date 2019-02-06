@@ -70,7 +70,10 @@ class BayesianClassifier(Brick):
         output = Brick.__call__(self, arg_tensor)
         for operation in self.ops:
             if 'bayesian' in operation.name:
-                self.losses.append(operation.losses)
+                if type(operation.losses) is list:
+                    self.losses += operation.losses
+                else:
+                    self.losses.append(operation.losses)
         return output
 
     def transfer(self, other_clf):
