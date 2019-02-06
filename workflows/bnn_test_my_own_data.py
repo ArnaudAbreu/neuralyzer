@@ -44,6 +44,7 @@ import tensorflow_probability as tfp
 from tensorflow.contrib.learn.python.learn.datasets import mnist
 
 from neuralyzer.archi import BayesianClassifier
+from neuralyzer.data import FolderGenerator as foldgen
 
 # TODO(b/78137893): Integration tests currently fail with seaborn imports.
 warnings.simplefilter(action="ignore")
@@ -59,7 +60,7 @@ tfd = tfp.distributions
 IMAGE_SHAPE = [28, 28, 1]
 
 flags.DEFINE_float("learning_rate",
-                   default=0.001,
+                   default=0.0001,
                    help="Initial learning rate.")
 flags.DEFINE_integer("max_steps",
                      default=6000,
@@ -117,29 +118,6 @@ def build_input_pipeline(mnist_data, batch_size, heldout_size):
   return images, labels, handle, training_iterator, heldout_iterator
 
 
-def build_fake_data(num_examples=10):
-  """Build fake MNIST-style data for unit testing."""
-
-  class Dummy(object):
-    pass
-
-  num_examples = 10
-  mnist_data = Dummy()
-  mnist_data.train = Dummy()
-  mnist_data.train.images = np.float32(np.random.randn(
-      num_examples, *IMAGE_SHAPE))
-  mnist_data.train.labels = np.int32(np.random.permutation(
-      np.arange(num_examples)))
-  mnist_data.train.num_examples = num_examples
-  mnist_data.validation = Dummy()
-  mnist_data.validation.images = np.float32(np.random.randn(
-      num_examples, *IMAGE_SHAPE))
-  mnist_data.validation.labels = np.int32(np.random.permutation(
-      np.arange(num_examples)))
-  mnist_data.validation.num_examples = num_examples
-  return mnist_data
-
-
 def main(argv):
 
   del argv  # unused
@@ -150,11 +128,17 @@ def main(argv):
     tf.gfile.DeleteRecursively(FLAGS.model_dir)
   tf.gfile.MakeDirs(FLAGS.model_dir)
 
-  mnist_data = mnist.read_data_sets(FLAGS.data_dir, reshape=False)
+  # mnist_data = mnist.read_data_sets(FLAGS.data_dir, reshape=False)
 
-  images, labels, handle, training_iterator, heldout_iterator = build_input_pipeline(mnist_data,
-                                                                                     FLAGS.batch_size,
-                                                                                     mnist_data.validation.num_examples)
+  # images, labels, handle, training_iterator, heldout_iterator = build_input_pipeline(mnist_data,
+  #                                                                                    FLAGS.batch_size,
+  #                                                                                    mnist_data.validation.num_examples)
+
+  train_data = foldgen('/Users/administrateur/Pictures/ToyDatasets/wide_tall_rectangles/Training', 10, size=(28, 28), class_mode='sparse')
+  valid_data = foldgen('/Users/administrateur/Pictures/ToyDatasets/wide_tall_rectangles/Validation', 10, size=(28, 28), class_mode='sparse')
+
+  images = tf.placeholder(dtype=tf.float32, shape=(None, 28, 28, 1), name='input')
+  labels = tf.placeholder(dtype=tf.int32, shape=(None,), name='labels')
 
   # Build a Bayesian LeNet5 network. We use the Flipout Monte Carlo estimator
   # for the convolution and fully-connected layers: this enables lower
@@ -172,37 +156,12 @@ def main(argv):
                                   end_activation=None,
                                   output_channels=10)
 
-  # with tf.name_scope("bayesian_neural_net", values=[images]):
-  #   neural_net = tf.keras.Sequential([
-  #       tfp.layers.Convolution2DFlipout(6,
-  #                                       kernel_size=5,
-  #                                       padding="SAME",
-  #                                       activation=tf.nn.relu),
-  #       tf.keras.layers.MaxPooling2D(pool_size=[2, 2],
-  #                                    strides=[2, 2],
-  #                                    padding="SAME"),
-  #       tfp.layers.Convolution2DFlipout(16,
-  #                                       kernel_size=5,
-  #                                       padding="SAME",
-  #                                       activation=tf.nn.relu),
-  #       tf.keras.layers.MaxPooling2D(pool_size=[2, 2],
-  #                                    strides=[2, 2],
-  #                                    padding="SAME"),
-  #       tfp.layers.Convolution2DFlipout(120,
-  #                                       kernel_size=5,
-  #                                       padding="SAME",
-  #                                       activation=tf.nn.relu),
-  #       tf.keras.layers.Flatten(),
-  #       tfp.layers.DenseFlipout(84, activation=tf.nn.relu),
-  #       tfp.layers.DenseFlipout(10)
-  #       ])
-
   logits = neural_net(images)
   labels_distribution = tfd.Categorical(logits=logits)
 
   # Compute the -ELBO as the loss, averaged over the batch size.
   neg_log_likelihood = -tf.reduce_mean(labels_distribution.log_prob(labels))
-  kl = sum(neural_net.losses) / mnist_data.train.num_examples
+  kl = sum(neural_net.losses) / 10
   elbo_loss = neg_log_likelihood + kl
 
   # Build metrics for evaluation. Predictions are formed from a single forward
@@ -210,20 +169,6 @@ def main(argv):
   predictions = tf.argmax(logits, axis=1)
   accuracy, accuracy_update_op = tf.metrics.accuracy(
       labels=labels, predictions=predictions)
-
-  # Extract weight posterior statistics for layers with weight distributions
-  # for later visualization.
-  # names = []
-  # qmeans = []
-  # qstds = []
-  # for i, layer in enumerate(neural_net.layers):
-  #   try:
-  #     q = layer.kernel_posterior
-  #   except AttributeError:
-  #     continue
-  #   names.append("Layer {}".format(i))
-  #   qmeans.append(q.mean())
-  #   qstds.append(q.stddev())
 
   with tf.name_scope("train"):
     optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
@@ -236,48 +181,21 @@ def main(argv):
     sess.run(init_op)
 
     # Run the training loop.
-    train_handle = sess.run(training_iterator.string_handle())
-    heldout_handle = sess.run(heldout_iterator.string_handle())
-    for step in range(FLAGS.max_steps):
+    # train_handle = sess.run(training_iterator.string_handle())
+    # heldout_handle = sess.run(heldout_iterator.string_handle())
+    step = 0
+    for x, y in train_data:
       _ = sess.run([train_op, accuracy_update_op],
-                   feed_dict={handle: train_handle})
-
+                   feed_dict={images: [np.expand_dims(i[:, :, 0], -1) for i in x], labels: y})
       if step % 100 == 0:
-        loss_value, accuracy_value = sess.run(
-            [elbo_loss, accuracy], feed_dict={handle: train_handle})
+        imvals, labvals, loss_value, accuracy_value = sess.run(
+            [images, labels, elbo_loss, accuracy], feed_dict={images: [np.expand_dims(i[:, :, 0], -1) for i in x], labels: y})
         print("Step: {:>3d} Loss: {:.3f} Accuracy: {:.3f}".format(
             step, loss_value, accuracy_value))
 
-      # if (step+1) % FLAGS.viz_steps == 0:
-      #   # Compute log prob of heldout set by averaging draws from the model:
-      #   # p(heldout | train) = int_model p(heldout|model) p(model|train)
-      #   #                   ~= 1/n * sum_{i=1}^n p(heldout | model_i)
-      #   # where model_i is a draw from the posterior p(model|train).
-      #   probs = np.asarray([sess.run((labels_distribution.probs),
-      #                                feed_dict={handle: heldout_handle})
-      #                       for _ in range(FLAGS.num_monte_carlo)])
-      #   mean_probs = np.mean(probs, axis=0)
-      #
-      #   image_vals, label_vals = sess.run((images, labels),
-      #                                     feed_dict={handle: heldout_handle})
-      #   heldout_lp = np.mean(np.log(mean_probs[np.arange(mean_probs.shape[0]),
-      #                                          label_vals.flatten()]))
-      #   print(" ... Held-out nats: {:.3f}".format(heldout_lp))
-      #
-      #   qm_vals, qs_vals = sess.run((qmeans, qstds))
-      #
-      #   if HAS_SEABORN:
-      #     plot_weight_posteriors(names, qm_vals, qs_vals,
-      #                            fname=os.path.join(
-      #                                FLAGS.model_dir,
-      #                                "step{:05d}_weights.png".format(step)))
-      #
-      #     plot_heldout_prediction(image_vals, probs,
-      #                             fname=os.path.join(
-      #                                 FLAGS.model_dir,
-      #                                 "step{:05d}_pred.png".format(step)),
-      #                             title="mean heldout logprob {:.2f}"
-      #                             .format(heldout_lp))
+        # print('images: ', imvals)
+        # print('labels: ', labvals)
+      step += 1
 
 if __name__ == "__main__":
   tf.app.run()

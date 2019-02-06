@@ -243,10 +243,13 @@ def main(argv):
                    feed_dict={handle: train_handle})
 
       if step % 100 == 0:
-        loss_value, accuracy_value = sess.run(
-            [elbo_loss, accuracy], feed_dict={handle: train_handle})
+        imvals, labvals, loss_value, accuracy_value = sess.run(
+            [images, labels, elbo_loss, accuracy], feed_dict={handle: train_handle})
         print("Step: {:>3d} Loss: {:.3f} Accuracy: {:.3f}".format(
             step, loss_value, accuracy_value))
+
+        print('images: ', imvals)
+        print('labels: ', labvals)
 
       # if (step+1) % FLAGS.viz_steps == 0:
       #   # Compute log prob of heldout set by averaging draws from the model:
