@@ -65,10 +65,6 @@ class BayesianClassifier(Brick):
                                                 name='final_fc'))
         self.kerasmodel = tf.keras.Sequential(self.ops)
 
-    def __call__(self, arg_tensor):
-
-        Brick.__call__(self, arg_tensor)
-
     def transfer(self, other_clf):
 
         op_list = []
