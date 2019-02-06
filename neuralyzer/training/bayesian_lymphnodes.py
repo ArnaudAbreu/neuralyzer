@@ -51,7 +51,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
                                fcdropouts=[0.5, 0.5],
                                conv_activations=['relu', 'relu', 'relu'],
                                fc_activations=['relu', 'relu'],
-                               end_activation=None,
+                               end_activation='softmax',
                                output_channels=2)
 
     clf = BCLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=lr, optimizer=opt)

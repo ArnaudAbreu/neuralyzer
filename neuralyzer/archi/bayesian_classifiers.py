@@ -17,7 +17,7 @@ class BayesianClassifier(Brick):
                  fcdropouts=[0.],
                  conv_activations=['relu', 'relu'],
                  fc_activations=['relu'],
-                 end_activation=None,
+                 end_activation='softmax',
                  output_channels=10):
 
         """
