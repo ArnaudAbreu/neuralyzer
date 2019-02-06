@@ -45,13 +45,13 @@ class BCLF(Model):
         # elbo_loss = neg_log_likelihood + kl
 
         self.Y_predcat = tf.cast(tf.argmax(self.Y_pred, axis=1, name='classes'), tf.int32)
-        self.Y_cat = tf.cast(tf.argmax(self.Y, axis=1, name='classes'), tf.int32)
+        # self.Y_cat = tf.cast(tf.argmax(self.Y, axis=1, name='classes'), tf.int32)
 
         # objectives
         self.fY = tf.cast(self.Y, tf.float32)
         # self.loss = tf.reduce_mean(tf.keras.backend.categorical_crossentropy(self.fY, self.Y_pred, from_logits=False))
         self.loss = -tf.reduce_mean(self.labels_distribution.log_prob(self.Y))
-        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.Y_predcat, self.Y_cat), tf.float32))
+        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.Y_predcat, self.Y), tf.float32))
 
         # optimization
         if optimizer == 'Adam':
