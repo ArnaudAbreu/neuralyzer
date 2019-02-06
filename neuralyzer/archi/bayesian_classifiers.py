@@ -28,7 +28,7 @@ class BayesianClassifier(Brick):
 
         for depth in range(len(filters)):
 
-            opname = "convolution_" + str(depth)
+            opname = "bayesianconvolution_" + str(depth)
             dropname = "dropout_" + str(depth)
             poolname = "pool_" + str(depth)
             opfilters = filters[depth]
@@ -51,7 +51,7 @@ class BayesianClassifier(Brick):
 
         for depth in range(len(fc)):
 
-            opname = 'fc_' + str(depth)
+            opname = 'bayesianfc_' + str(depth)
             dropname = 'fc_dropout_' + str(depth)
             opunits = fc[depth]
             opdropout = fcdropouts[depth]
@@ -62,12 +62,16 @@ class BayesianClassifier(Brick):
 
         self.ops.append(tfp.layers.DenseFlipout(output_channels,
                                                 activation=end_activation,
-                                                name='final_fc'))
-        self.kerasmodel = tf.keras.Sequential(self.ops)
+                                                name='bayesianfinal_fc'))
+        # self.kerasmodel = tf.keras.Sequential(self.ops)
+        self.losses = []
 
-    def __call__(self, argtensor):
-
-        return self.kerasmodel(argtensor)
+    def __call__(self, arg_tensor):
+        output = Brick.__call__(self, arg_tensor)
+        for operation in self.ops:
+            if 'bayesian' in operation.name:
+                self.losses.append(operation.losses)
+        return output
 
     def transfer(self, other_clf):
 
