@@ -39,8 +39,8 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
     w = patchsize
     c = inputchannels
 
-    train_data = foldgen(train_folder, batchsize, size=(h, w))
-    valid_data = foldgen(valid_folder, batchsize, size=(h, w))
+    train_data = foldgen(train_folder, batchsize, size=(h, w), class_mode='binary')
+    valid_data = foldgen(valid_folder, batchsize, size=(h, w), class_mode='binary')
 
     archi = BayesianClassifier(brickname='reference',
                                filters=[32, 64, 128],
