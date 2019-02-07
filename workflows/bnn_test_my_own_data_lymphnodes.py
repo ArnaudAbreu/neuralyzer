@@ -197,7 +197,7 @@ def main(argv):
     accuracy, accuracy_update_op = tf.metrics.accuracy(labels=labels, predictions=predictions)
 
     with tf.name_scope("train"):
-        optimizer = tf.train.AdamOptimizer(learning_rate=args.lr)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=args.lr)
         train_op = optimizer.minimize(elbo_loss)
 
     init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())

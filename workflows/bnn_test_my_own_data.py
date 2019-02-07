@@ -60,7 +60,7 @@ tfd = tfp.distributions
 IMAGE_SHAPE = [28, 28, 1]
 
 flags.DEFINE_float("learning_rate",
-                   default=0.0001,
+                   default=0.01,
                    help="Initial learning rate.")
 flags.DEFINE_integer("max_steps",
                      default=6000,
@@ -171,7 +171,7 @@ def main(argv):
       labels=labels, predictions=predictions)
 
   with tf.name_scope("train"):
-    optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.learning_rate)
     train_op = optimizer.minimize(elbo_loss)
 
   init_op = tf.group(tf.global_variables_initializer(),
