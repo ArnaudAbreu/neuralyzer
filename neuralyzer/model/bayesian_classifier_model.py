@@ -107,6 +107,8 @@ class BCLF(Model):
 
         probs = numpy.asarray([self.sess.run([self.labels_distribution.probs], feed_dict=feed_dict) for _ in range(self.post_sampling)])
         mean_probs = numpy.mean(probs, axis=0)
+        print(y.shape)
+        print(y.dtype)
         # mean probs is (batch, n_classes)
         logprob = numpy.mean(numpy.log(mean_probs[numpy.arange(mean_probs.shape[0]), y]))
         accuracyval = (numpy.argmax(mean_probs, axis=1) == y).sum()
