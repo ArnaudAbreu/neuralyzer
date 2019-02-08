@@ -11,7 +11,7 @@ tfd = tfp.distributions
 
 class BCLF(Model):
 
-    def __init__(self, clf, height=28, width=28, colors=1, n_classes=10, learning_rate=0.001, kl_annealing=1., post_sampling=1000, optimizer='SGD', model_path=None):
+    def __init__(self, clf, height=28, width=28, colors=1, n_classes=10, learning_rate=0.001, kl_annealing=1., post_sampling=100, optimizer='SGD', model_path=None):
 
         """
         A bayesian classifier model made to fit on mnist-like datasets.
@@ -110,7 +110,7 @@ class BCLF(Model):
         # print(mean_probs.shape)
         # mean probs is (batch, n_classes)
         logprob = numpy.mean(numpy.log(mean_probs[numpy.arange(mean_probs.shape[0]), y.astype(int)]))
-        accuracyval = (numpy.argmax(mean_probs[0], axis=1) == y.astype(int)).sum()
+        accuracyval = (numpy.argmax(mean_probs[0], axis=1) == y.astype(int)).mean()
 
         # lossval, accuracyval = self.sess.run([self.loss, self.accuracy], feed_dict=feed_dict)
         return logprob, accuracyval
