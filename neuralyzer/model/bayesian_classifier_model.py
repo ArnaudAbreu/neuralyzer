@@ -110,7 +110,7 @@ class BCLF(Model):
         print(mean_probs.shape)
         # mean probs is (batch, n_classes)
         logprob = numpy.mean(numpy.log(mean_probs[numpy.arange(mean_probs.shape[0]), y.astype(int)]))
-        accuracyval = (numpy.argmax(mean_probs, axis=1) == y.astype(int)).sum()
+        accuracyval = (numpy.argmax(mean_probs[0], axis=1) == y.astype(int)).sum()
 
         # lossval, accuracyval = self.sess.run([self.loss, self.accuracy], feed_dict=feed_dict)
         return logprob, accuracyval
