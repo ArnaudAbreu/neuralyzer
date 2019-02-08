@@ -66,6 +66,9 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
 
     accuracyplot = []
 
+    i = 0
+    lambdakl = 1.
+
     for e in range(epochs):
 
         print('EPOCH: ' + str(e + 1) + str('/') + str(epochs))
@@ -77,12 +80,14 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
         for x, y in trainprogressbar:
 
             # lval, klval, accval = clf.fit(x, y)
-            lval, accval = clf.fit(x, y)
+            lval, accval = clf.fit(x, y, lambdakl)
             trainlvals.append(lval)
             trainaccvals.append(accval)
             metrics = [('loss', numpy.mean(trainlvals)), ('acc', numpy.mean(trainaccvals))]
             desc = monitor(metrics, 4)
             trainprogressbar.set_description(desc=desc, refresh=True)
+            i += 1
+            lambdakl = 2 ** (-i)
 
         trainlvals = []
         trainaccvals = []
@@ -93,10 +98,10 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
 
         for x, y in validprogressbar:
 
-            lval, accval = clf.validate(x, y)
+            lval, accval = clf.validate(x, y, lambdakl)
             validlvals.append(lval)
             validaccvals.append(accval)
-            metrics = [('loss', numpy.mean(validlvals)), ('acc', numpy.mean(validaccvals))]
+            metrics = [('logprob', numpy.mean(validlvals)), ('acc', numpy.mean(validaccvals))]
             desc = monitor(metrics, 4)
             validprogressbar.set_description(desc=desc, refresh=True)
 
