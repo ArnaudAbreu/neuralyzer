@@ -53,7 +53,7 @@ class BCLF(Model):
         self.fY = tf.cast(self.Y, tf.float32)
         # self.loss = tf.reduce_mean(tf.keras.backend.categorical_crossentropy(self.fY, self.Y_pred, from_logits=False))
         self.neg_log_likelihood = -tf.reduce_mean(self.labels_distribution.log_prob(self.Y))
-        self.kl = sum(bayesianlenet.losses) / tf.cast(tf.shape(self.Y)[0], tf.float32)
+        self.kl = sum(self.bayesianlenet.losses) / tf.cast(tf.shape(self.Y)[0], tf.float32)
         self.loss = self.neg_log_likelihood + self.kl_annealing * self.kl
         self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.Y_predcat, self.Y), tf.float32))
 
