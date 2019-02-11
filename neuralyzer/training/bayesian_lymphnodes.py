@@ -68,6 +68,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
 
     i = 0
     lambdakl = 1.
+    total_batches = float(epochs) * float(train_data.steps)
 
     for e in range(epochs):
 
@@ -87,7 +88,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
             desc = monitor(metrics, 4)
             trainprogressbar.set_description(desc=desc, refresh=True)
             i += 1
-            lambdakl = 2 ** (-i)
+            lambdakl = (-1. / total_batches) * i + 1.
 
         trainlvals = []
         trainaccvals = []
