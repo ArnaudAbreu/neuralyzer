@@ -56,7 +56,7 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                                end_activation=None,
                                output_channels=2)
 
-    clf = BCLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
+    clf = BCLF2(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
 
     outputdir = os.path.join(outfolder, 'slides_prediction')
 

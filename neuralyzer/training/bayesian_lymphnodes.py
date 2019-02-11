@@ -1,6 +1,6 @@
 # coding: utf8
 from ..data import FolderGenerator as foldgen
-from ..model import BCLF
+from ..model import BCLF2
 from ..archi import Classifier, BayesianClassifier
 from ..render import monitor
 from tqdm import tqdm
@@ -54,7 +54,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
                                end_activation=None,
                                output_channels=2)
 
-    clf = BCLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=lr, optimizer=opt)
+    clf = BCLF2(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=lr, optimizer=opt)
 
     print(clf)
 

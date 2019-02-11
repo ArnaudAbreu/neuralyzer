@@ -64,16 +64,20 @@ class BayesianClassifier(Brick):
                                                 activation=end_activation,
                                                 name='bayesianfinal_fc'))
         self.losses = []
+        self.called = False
 
     def __call__(self, arg_tensor):
 
         output = Brick.__call__(self, arg_tensor)
-        for operation in self.ops:
-            if 'bayesian' in operation.name:
-                if type(operation.losses) is list:
-                    self.losses += operation.losses
-                else:
-                    self.losses.append(operation.losses)
+
+        if not self.called:
+            for operation in self.ops:
+                if 'bayesian' in operation.name:
+                    if type(operation.losses) is list:
+                        self.losses += operation.losses
+                    else:
+                        self.losses.append(operation.losses)
+            self.called = True
 
         return output
 
