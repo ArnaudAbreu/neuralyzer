@@ -88,7 +88,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
             desc = monitor(metrics, 4)
             trainprogressbar.set_description(desc=desc, refresh=True)
             i += 1
-            lambdakl = (-1. / total_batches) * i + 1.
+            lambdakl = 0.0000001
 
         trainlvals = []
         trainaccvals = []
