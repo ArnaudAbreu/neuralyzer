@@ -1,8 +1,8 @@
 # coding: utf8
 
-from ..data.wsi2pred import predict_slides, predict_slides_from_labpathlist
+from ..data.wsi2pred import predict_slides, sample_predict_slides_from_labpathlist
 from ..model import BCLF
-from ..archi import Classifier, BayesianClassifier
+from ..archi import BayesianClassifier
 from ..render import monitor
 from tqdm import tqdm
 import numpy
@@ -48,15 +48,13 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                                filters=[32, 64, 128],
                                kernels=[4, 5, 6],
                                strides=[1, 1, 1],
-                               dropouts=[0.1, 0.2, 0.25],
-                               fc=[1024, 1024],
-                               fcdropouts=[0.5, 0.5],
+                               fc=[256, 256],
                                conv_activations=['relu', 'relu', 'relu'],
                                fc_activations=['relu', 'relu'],
                                end_activation=None,
                                output_channels=2)
 
-    clf = BCLF2(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
+    clf = BCLF(archi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
 
     outputdir = os.path.join(outfolder, 'slides_prediction')
 
@@ -66,6 +64,6 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
     # predict slides
     # predict_slides(clf, slidedir, outputdir, prediction_level=predlevel, n_classes=2)
     # predict_slides_from_dir(clf, slidedir, outputdir, predlevel, interval, w, h)
-    predict_slides_from_labpathlist(clf, labpathlist, outputdir, predlevel, patchinter, w, h)
+    sample_predict_slides_from_labpathlist(clf, labpathlist, outputdir, predlevel, patchinter, w, h)
 
     clf.close()

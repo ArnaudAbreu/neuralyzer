@@ -2,7 +2,7 @@
 import tensorflow as tf
 import tensorflow_probability as tfp
 from .bricks import *
-from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 
 
 class BayesianClassifier(Brick):
@@ -12,9 +12,7 @@ class BayesianClassifier(Brick):
                  filters=[20, 50],
                  kernels=[5, 5],
                  strides=[1, 1],
-                 dropouts=[0., 0.],
                  fc=[500],
-                 fcdropouts=[0.],
                  conv_activations=['relu', 'relu'],
                  fc_activations=['relu'],
                  end_activation=None,
@@ -29,12 +27,10 @@ class BayesianClassifier(Brick):
         for depth in range(len(filters)):
 
             opname = "bayesianconvolution_" + str(depth)
-            dropname = "dropout_" + str(depth)
             poolname = "pool_" + str(depth)
             opfilters = filters[depth]
             opker = kernels[depth]
             opstride = strides[depth]
-            opdropout = dropouts[depth]
             opac = conv_activations[depth]
             self.ops.append(tfp.layers.Convolution2DFlipout(filters=opfilters,
                                                             kernel_size=opker,
@@ -52,9 +48,7 @@ class BayesianClassifier(Brick):
         for depth in range(len(fc)):
 
             opname = 'bayesianfc_' + str(depth)
-            dropname = 'fc_dropout_' + str(depth)
             opunits = fc[depth]
-            opdropout = fcdropouts[depth]
             opac = fc_activations[depth]
             self.ops.append(tfp.layers.DenseFlipout(opunits, activation=opac, name=opname))
             # Dropout is not necessary with bayesian networks (not supposed to over-fit)

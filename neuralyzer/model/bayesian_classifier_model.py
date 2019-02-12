@@ -26,6 +26,7 @@ class BCLF(Model):
 
         # placeholder definition
         self.X = tf.placeholder(dtype=tf.float32, shape=(None, self.h_input, self.w_input, self.input_channels), name='input')
+        # self.X_sample = [tf.placeholder(dtype=tf.float32, shape=(None, self.h_input, self.w_input, self.input_channels), name='input_' + str(k)) for k in range(post_sampling)]
         self.Y = tf.placeholder(dtype=tf.int32, shape=(None,), name='ground_truth')
         self.lr = tf.get_variable("learning_rate", initializer=learning_rate, trainable=False)
         self.kl_annealing = tf.get_variable("kl_annealing", initializer=kl_annealing, trainable=False)
@@ -37,7 +38,18 @@ class BCLF(Model):
         # tensors for objectives
 
         # tensors for objectives
-        self.Y_pred = self.bayesianlenet(self.X)
+        # self.Y_pred = self.bayesianlenet(self.X)
+
+        # Y_pred is a prediction formed on a single forward pass of the probabilistic layer
+        # It is a cheap but noisy prediction.
+        # Problem is that you cannot have a reliable prediction and a reliable
+        # loss evaluation based on that prediction...
+        # So, we draw multiple samples and average prediction.
+        self.y_sample = []
+        for i in range(post_sampling):
+            self.y_sample.append(self.bayesianlenet(self.X))
+
+        self.Y_pred = tf.reduce_mean(tf.stack(self.y_sample, axis=0), axis=0, keepdims=False)
 
         # self.logits = neural_net(images)
         self.labels_distribution = tfd.Categorical(logits=self.Y_pred)
@@ -93,8 +105,8 @@ class BCLF(Model):
         # I changed it to be clearer (my point of view...)
         feed_dict = {self.X: x, self.Y: y, self.kl_annealing: kl, K.learning_phase(): 1}
         # _, negloglikelyhood, kldiv, accuracyval = self.sess.run([self.training, self.neg_log_likelyhood, self.kl, self.accuracy], feed_dict=feed_dict)
-        _, negloglikelyhood, accuracyval = self.sess.run([self.training, self.loss, self.accuracy], feed_dict=feed_dict)
-        return negloglikelyhood, accuracyval
+        _, lossval, accuracyval = self.sess.run([self.training, self.loss, self.accuracy], feed_dict=feed_dict)
+        return lossval, accuracyval
 
     def validate(self, x, y, kl):
 
@@ -105,23 +117,31 @@ class BCLF(Model):
         # accuracy will be computed here, not in tf graph...
         feed_dict = {self.X: x, self.Y: y, self.kl_annealing: kl, K.learning_phase(): 0}
 
-        probs = numpy.asarray([self.sess.run([self.labels_distribution.probs], feed_dict=feed_dict) for _ in range(self.post_sampling)])
-        mean_probs = numpy.mean(probs, axis=0)
+        # probs = numpy.asarray([self.sess.run([self.labels_distribution.probs], feed_dict=feed_dict) for _ in range(self.post_sampling)])
+        # mean_probs = numpy.mean(probs, axis=0)
         # print(mean_probs.shape)
         # mean probs is (batch, n_classes)
-        logprob = numpy.mean(numpy.log(mean_probs[numpy.arange(mean_probs.shape[0]), y.astype(int)]))
-        accuracyval = (numpy.argmax(mean_probs[0], axis=1) == y.astype(int)).mean()
+        # logprob = numpy.mean(numpy.log(mean_probs[numpy.arange(mean_probs.shape[0]), y.astype(int)]))
+        # accuracyval = (numpy.argmax(mean_probs[0], axis=1) == y.astype(int)).mean()
 
-        # lossval, accuracyval = self.sess.run([self.loss, self.accuracy], feed_dict=feed_dict)
-        return logprob, accuracyval
+        lossval, accuracyval = self.sess.run([self.loss, self.accuracy], feed_dict=feed_dict)
+        return lossval, accuracyval
 
     def predict(self, x):
 
         feed_dict = {self.X: x, K.learning_phase(): 0}
-        probs = numpy.asarray([self.sess.run([self.labels_distribution.probs], feed_dict=feed_dict) for _ in range(self.post_sampling)])
-        mean_probs = numpy.mean(probs, axis=0)
-        y_pred = self.sess.run([self.Y_pred], feed_dict=feed_dict)
-        return numpy.argmax(mean_probs[0], axis=1)
+        # probs = numpy.asarray([self.sess.run([self.labels_distribution.probs], feed_dict=feed_dict) for _ in range(self.post_sampling)])
+        # mean_probs = numpy.mean(probs, axis=0)
+        predval = self.sess.run([self.Y_pred], feed_dict=feed_dict)
+        return predval
+
+    def sample_predict(self, x):
+
+        feed_dict = {self.X: x, K.learning_phase(): 0}
+        # probs = numpy.asarray([self.sess.run([self.labels_distribution.probs], feed_dict=feed_dict) for _ in range(self.post_sampling)])
+        # mean_probs = numpy.mean(probs, axis=0)
+        predvals = self.sess.run(self.y_sample, feed_dict=feed_dict)
+        return predvals
 
     def close(self, path=None):
 
