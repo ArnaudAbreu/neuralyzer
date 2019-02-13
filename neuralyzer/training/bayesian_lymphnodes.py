@@ -47,7 +47,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
                                filters=[32, 64, 128],
                                kernels=[4, 5, 6],
                                strides=[1, 1, 1],
-                               fc=[256, 256],
+                               fc=[512, 512],
                                conv_activations=['relu', 'relu', 'relu'],
                                fc_activations=['relu', 'relu'],
                                end_activation=None,

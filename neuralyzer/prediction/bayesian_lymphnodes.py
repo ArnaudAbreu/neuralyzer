@@ -48,7 +48,7 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                                filters=[32, 64, 128],
                                kernels=[4, 5, 6],
                                strides=[1, 1, 1],
-                               fc=[256, 256],
+                               fc=[512, 512],
                                conv_activations=['relu', 'relu', 'relu'],
                                fc_activations=['relu', 'relu'],
                                end_activation=None,
