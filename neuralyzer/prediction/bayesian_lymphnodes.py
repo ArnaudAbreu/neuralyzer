@@ -11,7 +11,7 @@ import os
 import pickle
 
 
-def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchinter, inputchannels):
+def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchinter, inputchannels, batchsize=None):
 
     """
     A function to predict a list of slides given in a python pickled file
@@ -64,6 +64,6 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
     # predict slides
     # predict_slides(clf, slidedir, outputdir, prediction_level=predlevel, n_classes=2)
     # predict_slides_from_dir(clf, slidedir, outputdir, predlevel, interval, w, h)
-    sample_predict_slides_from_labpathlist(clf, labpathlist, outputdir, predlevel, patchinter, w, h)
+    sample_predict_slides_from_labpathlist(clf, labpathlist, outputdir, predlevel, patchinter, w, h, batchsize=batchsize)
 
     clf.close()
