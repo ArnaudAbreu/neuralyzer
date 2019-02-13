@@ -48,6 +48,12 @@ parser.add_argument("--opt", default="SGD",
 parser.add_argument("--postsampling", type=int, default=100,
                     help="sample to draw for reliable monte carlo gradient estimation")
 
+parser.add_argument("--gendata", type=str, default='yes',
+                    help="whether to generate the data or not")
+
+parser.add_argument("--trainmodel", type=str, default='yes',
+                    help="whether to train a model or to use stored model")
+
 args = parser.parse_args()
 
 
@@ -59,7 +65,10 @@ labpathfile = os.path.join(args.outfolder, 'labpathlist.p')
 network_file = os.path.join(network_folder, 'model.ckpt')
 eval_folder = os.path.join(args.outfolder, 'Evaluation')
 
+if 'y' in args.gendata.lower():
+    generate(args.infolder, outpatchfolder, args.trainratio, args.level, args.sizex, args.sizey, args.interval)
 
-generate(args.infolder, outpatchfolder, args.trainratio, args.level, args.sizex, args.sizey, args.interval)
-train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder, args.postsampling)
+if 'y' in args.trainmodel.lower():
+    train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder, args.postsampling)
+
 test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3)
