@@ -71,4 +71,4 @@ if 'y' in args.gendata.lower():
 if 'y' in args.trainmodel.lower():
     train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder, args.postsampling)
 
-test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3)
+test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3, batchsize=args.batchsize)

@@ -238,7 +238,7 @@ def predict_slides_from_labpathlist(my_model, labpathlist, outputdir, patch_leve
             pickle.dump(outputdata, f)
 
 
-def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, patch_level, interval, x_size, y_size, maxfiles=None):
+def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, patch_level, interval, x_size, y_size, batchsize=None, maxfiles=None):
 
     """
     Same function as above, take a slide dir and predict every tile of every
@@ -292,7 +292,14 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
                                'groundtruth': lab})
             images.append(image.astype(float) / 255.)
 
-        preds = my_model.sample_predict(numpy.asarray(images))
+        if batchsize is None:
+            preds = my_model.sample_predict(numpy.asarray(images))
+        else:
+            preds = []
+            batches = int(float(len(images)) / float(batchsize))
+            for k in range(batches):
+                inputs = numpy.asarray(images[k * batchsize:k * batchsize + batchsize])
+                preds += my_model.sample_predict(inputs)
 
         for n in range(len(outputdata)):
 
