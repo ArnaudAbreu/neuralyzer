@@ -301,7 +301,7 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
         #         inputs = numpy.asarray(images[k * batchsize:k * batchsize + batchsize])
         #         preds += my_model.sample_predict(inputs)
 
-        for n in range(len(iamges)):
+        for n in range(len(images)):
 
             image = images[n]
 
