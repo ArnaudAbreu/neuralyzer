@@ -292,20 +292,22 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
                                'groundtruth': lab})
             images.append(image.astype(float) / 255.)
 
-        if batchsize is None:
-            preds = my_model.sample_predict(numpy.asarray(images))
-        else:
-            preds = []
-            batches = int(float(len(images)) / float(batchsize))
-            for k in range(batches):
-                inputs = numpy.asarray(images[k * batchsize:k * batchsize + batchsize])
-                preds += my_model.sample_predict(inputs)
+        # if batchsize is None:
+        #     preds = my_model.sample_predict(numpy.asarray(images))
+        # else:
+        #     preds = []
+        #     batches = int(float(len(images)) / float(batchsize))
+        #     for k in range(batches):
+        #         inputs = numpy.asarray(images[k * batchsize:k * batchsize + batchsize])
+        #         preds += my_model.sample_predict(inputs)
 
-        for n in range(len(preds)):
+        for n in range(len(iamges)):
 
-            outputdata[n]['prediction'] = [p for p in preds[n]]
+            image = images[n]
 
-        final_outputdata = [d for d in outputdata if 'prediction' in d.keys()]
+            outputdata[n]['prediction'] = my_model.sample_predict([image])
+
+        # final_outputdata = [d for d in outputdata if 'prediction' in d.keys()]
 
         outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
 
