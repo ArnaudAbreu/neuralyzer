@@ -301,11 +301,13 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
                 inputs = numpy.asarray(images[k * batchsize:k * batchsize + batchsize])
                 preds += my_model.sample_predict(inputs)
 
-        for n in range(len(outputdata)):
+        for n in range(len(preds)):
 
             outputdata[n]['prediction'] = [p[n] for p in preds]
+
+        final_outputdata = [d in outputdata if 'prediction' in d.keys()]
 
         outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
 
         with open(outfile, 'wb') as f:
-            pickle.dump(outputdata, f)
+            pickle.dump(final_outputdata, f)
