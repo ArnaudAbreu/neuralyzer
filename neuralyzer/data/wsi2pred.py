@@ -303,7 +303,7 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
 
         for n in range(len(preds)):
 
-            outputdata[n]['prediction'] = [p[n] for p in preds]
+            outputdata[n]['prediction'] = [p for p in preds[n]]
 
         final_outputdata = [d for d in outputdata if 'prediction' in d.keys()]
 
