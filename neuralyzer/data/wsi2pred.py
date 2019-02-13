@@ -305,7 +305,7 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
 
             outputdata[n]['prediction'] = [p[n] for p in preds]
 
-        final_outputdata = [d in outputdata if 'prediction' in d.keys()]
+        final_outputdata = [d for d in outputdata if 'prediction' in d.keys()]
 
         outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
 
