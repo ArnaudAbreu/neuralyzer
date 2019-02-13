@@ -312,4 +312,4 @@ def sample_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pat
         outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
 
         with open(outfile, 'wb') as f:
-            pickle.dump(final_outputdata, f)
+            pickle.dump(outputdata, f)
