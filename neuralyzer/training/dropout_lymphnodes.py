@@ -46,7 +46,7 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
                        filters=[32, 64, 128],
                        kernels=[4, 5, 6],
                        strides=[1, 1, 1],
-                       dropouts=[0.1, 0.2, 0.25],
+                       dropouts=[0., 0., 0.],
                        fc=[1024, 1024],
                        fcdropouts=[0.5, 0.5],
                        conv_activations=['relu', 'relu', 'relu'],
