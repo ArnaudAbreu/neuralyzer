@@ -1,7 +1,7 @@
 # coding: utf8
 
 from ..data.wsi2pred import predict_slides, dropout_predict_slides_from_labpathlist
-from ..model import CLF
+from ..model import CCLF
 from ..archi import Classifier
 from ..render import monitor
 from tqdm import tqdm
@@ -56,7 +56,7 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                           end_activation='softmax',
                           output_channels=2)
 
-    clf = CLF(refarchi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
+    clf = CCLF(refarchi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
 
     outputdir = os.path.join(outfolder, 'slides_prediction')
 

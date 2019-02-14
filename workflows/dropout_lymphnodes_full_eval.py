@@ -1,6 +1,6 @@
 # coding: utf8
 from neuralyzer.data.lymphnodes import generate
-from neuralyzer.training.lymphnodes import train
+from neuralyzer.training.dropout_lymphnodes import train
 from neuralyzer.prediction.dropout_lymphnodes import test
 import argparse
 import os
