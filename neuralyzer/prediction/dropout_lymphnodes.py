@@ -11,7 +11,7 @@ import os
 import pickle
 
 
-def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchinter, inputchannels):
+def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchinter, inputchannels, sampling=100):
 
     """
     A function to predict a list of slides given in a python pickled file
@@ -56,7 +56,7 @@ def test(labpathfile, device, basenet, outfolder, predlevel, patchsize, patchint
                           end_activation='softmax',
                           output_channels=2)
 
-    clf = CCLF(refarchi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD")
+    clf = CCLF(refarchi, height=h, width=w, colors=c, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD", sampling=sampling)
 
     outputdir = os.path.join(outfolder, 'slides_prediction')
 

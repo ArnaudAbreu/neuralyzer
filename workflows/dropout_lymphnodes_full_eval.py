@@ -41,6 +41,15 @@ parser.add_argument("--lr", type=float, default=0.01,
 parser.add_argument("--opt", default="SGD",
                     help="optimizer")
 
+parser.add_argument("--gendata", type=str, default='yes',
+                    help="whether to generate the data or not")
+
+parser.add_argument("--trainmodel", type=str, default='yes',
+                    help="whether to train a model or to use stored model")
+
+parser.add_argument("--sampling", type=int, default=100,
+                    help="number of samples to draw for certainty computation")
+
 args = parser.parse_args()
 
 outpatchfolder = os.path.join(args.outfolder, 'Data')
@@ -52,6 +61,9 @@ network_file = os.path.join(network_folder, 'model.ckpt')
 eval_folder = os.path.join(args.outfolder, 'Evaluation')
 
 
-generate(args.infolder, outpatchfolder, args.trainratio, args.level, args.sizex, args.sizey, args.interval)
-train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder)
-test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3)
+if 'y' in args.gendata.lower():
+    generate(args.infolder, outpatchfolder, args.trainratio, args.level, args.sizex, args.sizey, args.interval)
+if 'y' in args.trainmodel.lower():
+    train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder)
+
+test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3, sampling=args.sampling)
