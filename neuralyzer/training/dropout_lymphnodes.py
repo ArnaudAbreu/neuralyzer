@@ -8,6 +8,7 @@ import numpy
 import argparse
 import os
 import pickle
+from keras.applications.xception import Xception
 
 
 def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epochs, device, lr, opt, outfolder):
@@ -66,45 +67,56 @@ def train(train_folder, valid_folder, batchsize, patchsize, inputchannels, epoch
 
     accuracyplot = []
 
-    for e in range(epochs):
+    try:
+        for e in range(epochs):
 
-        print('EPOCH: ' + str(e + 1) + str('/') + str(epochs))
+            print('EPOCH: ' + str(e + 1) + str('/') + str(epochs))
 
-        print('TRAIN')
+            print('TRAIN')
 
-        trainprogressbar = tqdm(train_data, total=train_data.steps)
+            trainprogressbar = tqdm(train_data, total=train_data.steps)
 
-        for x, y in trainprogressbar:
+            for x, y in trainprogressbar:
 
-            lval, accval = clf.fit(x, y)
-            trainlvals.append(lval)
-            trainaccvals.append(accval)
-            metrics = [('loss', numpy.mean(trainlvals)), ('acc', numpy.mean(trainaccvals))]
-            desc = monitor(metrics, 4)
-            trainprogressbar.set_description(desc=desc, refresh=True)
+                lval, accval = clf.fit(x, y)
+                trainlvals.append(lval)
+                trainaccvals.append(accval)
+                metrics = [('loss', numpy.mean(trainlvals)), ('acc', numpy.mean(trainaccvals))]
+                desc = monitor(metrics, 4)
+                trainprogressbar.set_description(desc=desc, refresh=True)
 
-        trainlvals = []
-        trainaccvals = []
+            trainlvals = []
+            trainaccvals = []
 
-        print('VALIDATE')
+            print('VALIDATE')
 
-        validprogressbar = tqdm(valid_data, total=valid_data.steps)
+            validprogressbar = tqdm(valid_data, total=valid_data.steps)
 
-        for x, y in validprogressbar:
+            for x, y in validprogressbar:
 
-            lval, accval = clf.validate(x, y)
-            validlvals.append(lval)
-            validaccvals.append(accval)
-            metrics = [('loss', numpy.mean(validlvals)), ('acc', numpy.mean(validaccvals))]
-            desc = monitor(metrics, 4)
-            validprogressbar.set_description(desc=desc, refresh=True)
+                lval, accval = clf.validate(x, y)
+                validlvals.append(lval)
+                validaccvals.append(accval)
+                metrics = [('loss', numpy.mean(validlvals)), ('acc', numpy.mean(validaccvals))]
+                desc = monitor(metrics, 4)
+                validprogressbar.set_description(desc=desc, refresh=True)
 
-        accuracyplot.append(numpy.mean(validaccvals))
+            accuracyplot.append(numpy.mean(validaccvals))
 
-        validlvals = []
-        validaccvals = []
+            validlvals = []
+            validaccvals = []
 
-    clf.close(os.path.join(outfolder, 'model.ckpt'))
+        clf.close(os.path.join(outfolder, 'model.ckpt'))
 
-    with open(os.path.join(outfolder, 'accuracyplot.p'), 'wb') as f:
-        pickle.dump(accuracyplot, f)
+        with open(os.path.join(outfolder, 'accuracyplot.p'), 'wb') as f:
+            pickle.dump(accuracyplot, f)
+
+    # user can stop learning phase but the model will be saved
+    except KeyboardInterrupt:
+
+        print("user stopped iterations!!!")
+
+        clf.close(os.path.join(outfolder, 'model.ckpt'))
+
+        with open(os.path.join(outfolder, 'accuracyplot.p'), 'wb') as f:
+            pickle.dump(accuracyplot, f)
