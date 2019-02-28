@@ -4,3 +4,4 @@ from .classifiers import *
 from .bayesian_classifiers import *
 from .vgg import *
 from .unets import *
+from .vnets import *

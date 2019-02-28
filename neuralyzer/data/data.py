@@ -2,6 +2,7 @@
 import numpy
 import os
 from skimage.io import imread
+from sklearn.feature_extraction import image
 
 
 class FolderGenerator:

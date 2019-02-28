@@ -6,3 +6,4 @@ from .bayesian_classifier_model import *
 from .swa_classifier_model import *
 from .gan_model import *
 from .siamese_classifier_model import *
+from .vnet_distance import *
