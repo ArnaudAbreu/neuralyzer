@@ -157,8 +157,8 @@ ypred = reconst(ypred[0])
 fig, ax = plt.subplots(5, 2, figsize=(10, 20))
 
 for i in range(5):
-    ax[i, 0].imshow(xtestepoch[k])
-    ax[i, 1].imshow(ypred[k])
+    ax[i, 0].imshow(xtestepoch[i])
+    ax[i, 1].imshow(ypred[i])
 
     plt.savefig(os.path.join(outfolder, 'test.png'), dpi=300, bbox_inches='tight')
 
