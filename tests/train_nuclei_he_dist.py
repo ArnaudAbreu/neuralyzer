@@ -9,7 +9,9 @@ from neuralyzer.render import monitor
 import argparse
 import os
 import pickle
-from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
 
 
 # this file is a test for all functionalities of the deep ensemble
