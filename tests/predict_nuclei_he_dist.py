@@ -31,7 +31,7 @@ parser.add_argument("--basenet",
                     help="path to 1 budget trained network")
 
 args = parser.parse_args()
-outfolder = args.outfolder
+# outfolder = args.outfolder
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = args.device
 learning_rate = args.lr
