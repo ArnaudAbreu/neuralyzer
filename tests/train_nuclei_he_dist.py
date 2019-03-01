@@ -150,18 +150,20 @@ xtestepoch, ytestepoch_ = test_data_generator.get_epoch_data()
 
 ypred = vnet.predict(xtestepoch)
 
+print('prediction shape: ', ypred[0].shape)
+
 ypred = reconst(ypred[0])
 
 fig = plt.figure()
 
 for k in range(5):
-    subplotstr = '52' + str(2 * k)
+    subplotstr = '52' + str(2 * k + 1)
     ax = fig.add_subplot(subplotstr)
     plt.imshow(xtestepoch[k])
     ax.get_yaxis().set_ticks([])
     ax.get_xaxis().set_ticks([])
 
-    subplotstr = '52' + str(2 * k + 1)
+    subplotstr = '52' + str(2 * k + 2)
     ax = fig.add_subplot(subplotstr)
     plt.imshow(ypred[k])
     ax.get_yaxis().set_ticks([])
