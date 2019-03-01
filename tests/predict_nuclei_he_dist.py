@@ -63,6 +63,12 @@ print(vnet)
 
 predictions = vnet.predict(patches)
 
+pred = predictions[0]
+
+print('output prediction shape: ', pred.shape)
+print('output prediction dtype: ', pred.dtype)
+print('output prediction vals: ', numpy.unique(pred))
+
 predictionmap = numpy.zeros((input_image.shape[0], input_image.shape[1], ncat))
 
 for predidx in range(predictions[0].shape[0]):
