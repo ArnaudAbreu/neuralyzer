@@ -57,8 +57,8 @@ Yte = numpy.load(y_test_data_filename)
 training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 16, 128)
 test_data_generator = PatchFromNumpyGenerator(Xte, Yte, 16, 128)
 
-epochsize = 16 * Xtr.shape[0]
-n_batches = int(epochsize / batchsize)
+# epochsize = 16 * Xtr.shape[0]
+# n_batches = int(epochsize / batchsize)
 
 
 def to_categorical_pacth_overlaping(y, nb_cat):
@@ -101,6 +101,9 @@ try:
         #
         ytrainepoch = to_categorical_pacth_overlaping(ytrainepoch_, ncat)
         ytestepoch = to_categorical_pacth_overlaping(ytestepoch_, ncat)
+
+        epochsize = xtrainepoch.shape[0]
+        n_batches = int(epochsize / batchsize)
 
         trainprogressbar = tqdm(range(n_batches))
 
