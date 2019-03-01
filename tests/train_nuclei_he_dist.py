@@ -9,6 +9,7 @@ from neuralyzer.render import monitor
 import argparse
 import os
 import pickle
+from matplotlib import pyplot as plt
 
 
 # this file is a test for all functionalities of the deep ensemble
@@ -26,16 +27,16 @@ parser.add_argument("--device", default="0",
 parser.add_argument("--outfolder",
                     help="output folder for trained network")
 
-parser.add_argument("--lr", type=float, default=0.01,
+parser.add_argument("--lr", type=float, default=0.001,
                     help="learning rate for training")
 
 parser.add_argument("--indir",
                     help="data directory")
 
-parser.add_argument("--size", type=int, default=128,
+parser.add_argument("--size", type=int, default=64,
                     help="patch size")
 
-parser.add_argument("--ncat", type=int, default=24,
+parser.add_argument("--ncat", type=int, default=12,
                     help="number of categories")
 
 args = parser.parse_args()
@@ -44,7 +45,6 @@ epochs = args.epochs
 outfolder = args.outfolder
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = args.device
-learning_rate = args.lr
 
 
 x_train_data_filename = os.path.join(args.indir, "train/X/images.npy")
@@ -75,14 +75,19 @@ def to_categorical_pacth_overlaping(y, nb_cat):
     return y_cat
 
 
-h = 128
-w = 128
+def reconst(y):
+
+    return numpy.sum(y[:, :, :, 1:], axis=3)
+
+
+h = args.size
+w = args.size
 c = 3
-ncat = 24
+ncat = args.ncat
 
 archi = Vnet(n_classes=ncat)
 
-vnet = VnetDist(archi, height=h, width=w, colors=c, n_classes=ncat)
+vnet = VnetDist(archi, height=h, width=w, colors=c, n_classes=ncat, learning_rate=args.lr)
 
 print(vnet)
 
@@ -138,6 +143,29 @@ try:
 
 except KeyboardInterrupt:
     print('user interrupted training procedure!!!')
+
+xtestepoch, ytestepoch_ = test_data_generator.get_epoch_data()
+
+ypred = vnet.predict(xtestepoch)
+
+ypred = ypred[0]
+
+fig = plt.figure()
+
+for k in range(5):
+    subplotstr = '52' + str(2 * k)
+    ax = fig.add_subplot(subplotstr)
+    plt.imshow(xtestepoch[k])
+    ax.get_yaxis().set_ticks([])
+    ax.get_xaxis().set_ticks([])
+
+    subplotstr = '52' + str(2 * k + 1)
+    ax = fig.add_subplot(subplotstr)
+    plt.imshow(ypred[k])
+    ax.get_yaxis().set_ticks([])
+    ax.get_xaxis().set_ticks([])
+
+    plt.savefig(os.path.join(outfolder, 'test.png'), dpi=300, bbox_inches='tight')
 
 
 vnet.close(os.path.join(outfolder, 'model.ckpt'))
