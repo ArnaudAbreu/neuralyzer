@@ -154,20 +154,11 @@ print('prediction shape: ', ypred[0].shape)
 
 ypred = reconst(ypred[0])
 
-fig = plt.figure()
+fig, ax = plt.subplots(5, 2, figsize=(10, 20))
 
-for k in range(5):
-    subplotstr = '52' + str(2 * k + 1)
-    ax = fig.add_subplot(subplotstr)
-    plt.imshow(xtestepoch[k])
-    ax.get_yaxis().set_ticks([])
-    ax.get_xaxis().set_ticks([])
-
-    subplotstr = '52' + str(2 * k + 2)
-    ax = fig.add_subplot(subplotstr)
-    plt.imshow(ypred[k])
-    ax.get_yaxis().set_ticks([])
-    ax.get_xaxis().set_ticks([])
+for i in range(5):
+    ax[i, 0].imshow(xtestepoch[k])
+    ax[i, 1].imshow(ypred[k])
 
     plt.savefig(os.path.join(outfolder, 'test.png'), dpi=300, bbox_inches='tight')
 
