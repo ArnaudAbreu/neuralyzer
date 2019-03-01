@@ -14,7 +14,7 @@ import pickle
 # this file is a test for all functionalities of the deep ensemble
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--batchsize", type=int, default=5,
+parser.add_argument("--batchsize", type=int, default=28,
                     help="int, size of batches")
 
 parser.add_argument("--epochs", type=int, default=300,
@@ -34,6 +34,9 @@ parser.add_argument("--indir",
 
 parser.add_argument("--size", type=int, default=128,
                     help="patch size")
+
+parser.add_argument("--ncat", type=int, default=24,
+                    help="number of categories")
 
 args = parser.parse_args()
 batchsize = args.batchsize
@@ -75,7 +78,7 @@ def to_categorical_pacth_overlaping(y, nb_cat):
 h = 128
 w = 128
 c = 3
-ncat = 12
+ncat = 24
 
 archi = Vnet(n_classes=ncat)
 
