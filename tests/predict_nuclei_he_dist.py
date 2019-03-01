@@ -65,7 +65,7 @@ predictions = vnet.predict(patches)
 
 predictionmap = numpy.zeros((input_image.shape[0], input_image.shape[1], ncat))
 
-for predidx in range(len(predictions)):
+for predidx in range(predictions[0].shape[0]):
 
     line = int(predidx / plines)
     col = int(predidx % plines)
