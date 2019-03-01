@@ -40,12 +40,13 @@ h = 128
 w = 128
 c = 3
 ncat = 12
+step = 64
 
 winshape = (h, w, c)
 
 input_image = imread(args.infile)
 
-patches = view_as_windows(input_image, winshape, step=64)
+patches = view_as_windows(input_image, winshape, step=step)
 
 # number of word lines
 plines = patches.shape[0]
