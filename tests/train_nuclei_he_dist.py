@@ -59,8 +59,8 @@ Ytr = numpy.load(y_train_data_filename)
 Xte = numpy.load(x_test_data_filename)
 Yte = numpy.load(y_test_data_filename)
 
-training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 16, 128)
-test_data_generator = PatchFromNumpyGenerator(Xte, Yte, 16, 128)
+training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 16, args.size)
+test_data_generator = PatchFromNumpyGenerator(Xte, Yte, 16, args.size)
 
 # epochsize = 16 * Xtr.shape[0]
 # n_batches = int(epochsize / batchsize)
