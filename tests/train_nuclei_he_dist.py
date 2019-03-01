@@ -55,8 +55,10 @@ x_test_data_filename = os.path.join(args.indir, "test/X/images.npy")
 y_test_data_filename = os.path.join(args.indir, "test/Y/labels.npy")
 
 Xtr = numpy.load(x_train_data_filename)
+Xtr = Xtr.astype(float) / 255.
 Ytr = numpy.load(y_train_data_filename)
 Xte = numpy.load(x_test_data_filename)
+Xte = Xte.astype(float) / 255.
 Yte = numpy.load(y_test_data_filename)
 
 training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 32, args.size)
