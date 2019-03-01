@@ -59,7 +59,7 @@ Ytr = numpy.load(y_train_data_filename)
 Xte = numpy.load(x_test_data_filename)
 Yte = numpy.load(y_test_data_filename)
 
-training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 16, args.size)
+training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 32, args.size)
 test_data_generator = PatchFromNumpyGenerator(Xte, Yte, 16, args.size)
 
 # epochsize = 16 * Xtr.shape[0]
@@ -150,7 +150,7 @@ xtestepoch, ytestepoch_ = test_data_generator.get_epoch_data()
 
 ypred = vnet.predict(xtestepoch)
 
-ypred = ypred[0]
+ypred = reconst(ypred[0])
 
 fig = plt.figure()
 
