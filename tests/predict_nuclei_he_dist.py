@@ -72,5 +72,5 @@ for predidx in range(predictions[0].shape[0]):
 
     predictionmap[line * step:line * step + h, col * step:col * step + w] += predictions[0][predidx]
 
-with open(os.path.join(os.path.splitext(args.infile)[0], '_nuclei_prediction.p'), 'wb') as f:
+with open(os.path.splitext(args.infile)[0] + '_nuclei_prediction.p', 'wb') as f:
     pickle.dump(predictionmap, f)
