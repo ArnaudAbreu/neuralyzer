@@ -1,7 +1,7 @@
 # coding: utf8
 from neuralyzer.data.lymphnodes import generate
 from neuralyzer.training.dropout_lymphnodes import train
-from neuralyzer.prediction.dropout_lymphnodes import test
+from neuralyzer.prediction.dropout_lymphnodes import test, test_dir
 import argparse
 import os
 
@@ -50,15 +50,24 @@ parser.add_argument("--trainmodel", type=str, default='yes',
 parser.add_argument("--sampling", type=int, default=100,
                     help="number of samples to draw for certainty computation")
 
+parser.add_argument("--valid", default='yes',
+                    help="do test predictions")
+
+parser.add_argument("--test", default='yes',
+                    help="do test predictions")
+
+parser.add_argument("--testdir", default='NODIR',
+                    help="dirname to test files")
+
 args = parser.parse_args()
 
 outpatchfolder = os.path.join(args.outfolder, 'Data')
 train_folder = os.path.join(outpatchfolder, 'Train')
 valid_folder = os.path.join(outpatchfolder, 'Test')
 network_folder = os.path.join(args.outfolder, 'Model')
-labpathfile = os.path.join(args.outfolder, 'labpathlist.p')
 network_file = os.path.join(network_folder, 'model.ckpt')
 eval_folder = os.path.join(args.outfolder, 'Evaluation')
+labpathfile = os.path.join(args.outfolder, 'labpathlist.p')
 
 
 if 'y' in args.gendata.lower():
@@ -66,4 +75,8 @@ if 'y' in args.gendata.lower():
 if 'y' in args.trainmodel.lower():
     train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder)
 
-test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3, sampling=args.sampling)
+if 'y' in args.valid.lower():
+    test(labpathfile, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3, sampling=args.sampling)
+
+if 'y' in args.test.lower():
+    test_dir(args.testdir, args.device, network_file, eval_folder, args.level, args.sizex, args.interval, 3, sampling=args.sampling)

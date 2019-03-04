@@ -379,3 +379,69 @@ def dropout_predict_slides_from_labpathlist(my_model, labpathlist, outputdir, pa
 
         with open(outfile, 'wb') as f:
             pickle.dump(outputdata, f)
+
+
+def dropout_predict_slides_from_dir(my_model, dirname, outputdir, patch_level, interval, x_size, y_size, maxfiles=None):
+
+    """
+    Same function as above, take a slide dir and predict every tile of every
+    slide in that dir. It put every results in an outputdir.
+    This function takes advantage of the slight code written in the module patch.
+    It takes a list of filepaths, not a slide dir.
+
+    Arguments:
+        - my_model: classifier, object with a predict function that works on
+        RGB-images.
+        - labpathlist: list of tuples (str, str), absolute path to slides, with GT label.
+        - outputdir: str, absolute path to output directory.
+        - patch_level: int, level to extract patches, 0 = highest resolution.
+        - interval: int, number of pixels between two samples given at patch level.
+        - x_size: int, number of pixels of sample on x axis, given at patch level.
+        - y_size: int, number of pixels of sample on y axis given at patch level.
+        - maxfiles: int, file number limit, if None, no limit, default is None.
+
+    Returns:
+        - nothing, just store results of each slide in a file located in outputdir.
+    """
+
+    from openslide import OpenSlide
+
+    k = 0
+
+    namelist = [name for name in os.listdir(dirname) if '.mrxs' in name and name[0] != '.']
+    pathlist = [os.path.join(dirname, name) for name in namelist]
+
+    # for each slide
+    for path in pathlist:
+
+        k += 1
+
+        # inform user
+        print('#' * 20)
+        print('Processing file: ', path)
+        print('progression : ', (k / len(pathlist)) * 100, '%')
+        print('#' * 20)
+
+        slide = OpenSlide(path)
+        outputdata = []
+        images = []
+
+        for image, patch_level, absx, absy, absizex, absizey in patches_in_slide(slide, patch_level, interval, x_size, y_size, detailed=True):
+
+            outputdata.append({'patchlevel': patch_level,
+                               'absx': absx,
+                               'absy': absy,
+                               'absizex': absizex,
+                               'absizey': absizey})
+            images.append(image.astype(float) / 255.)
+
+        preds = my_model.predict(numpy.asarray(images))
+
+        for n in range(len(outputdata)):
+
+            outputdata[n]['prediction'] = [p[0][n] for p in preds]
+
+        outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_prediction.p")
+
+        with open(outfile, 'wb') as f:
+            pickle.dump(outputdata, f)
