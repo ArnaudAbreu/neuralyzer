@@ -61,7 +61,7 @@ Xte = numpy.load(x_test_data_filename)
 Xte = Xte.astype(float) / 255.
 Yte = numpy.load(y_test_data_filename)
 
-training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 32, args.size)
+training_data_generator = PatchFromNumpyGenerator(Xtr, Ytr, 40, args.size)
 test_data_generator = PatchFromNumpyGenerator(Xte, Yte, 16, args.size)
 
 # epochsize = 16 * Xtr.shape[0]
