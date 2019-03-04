@@ -107,11 +107,11 @@ class Vnet(Brick):
 
             y = self.ops[-1](y, recalls[-1])
 
+            self.head = Conv2D(self.n_classes, 1, activation='sigmoid')
+            y = self.head(y)
+
             if not self.trainable_weights:
                 self.trainable_weights = self.weights()
-
-            if self.headname == 'distance':
-
-                y = Conv2D(self.n_classes, 1, activation='sigmoid')(y)
+                self.trainable_weights.append(self.head)
 
             return y
