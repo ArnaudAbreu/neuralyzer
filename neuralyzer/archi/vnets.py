@@ -112,6 +112,6 @@ class Vnet(Brick):
 
             if not self.trainable_weights:
                 self.trainable_weights = self.weights()
-                self.trainable_weights.append(self.head.trainable_weights)
+                self.trainable_weights += self.head.trainable_weights
 
             return y
