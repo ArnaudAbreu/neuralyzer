@@ -101,9 +101,6 @@ def test_dir(dirname, device, basenet, outfolder, predlevel, patchsize, patchint
     w = patchsize
     c = inputchannels
 
-    with open(labpathfile, 'rb') as f:
-        labpathlist = pickle.load(f)
-
     refarchi = Classifier(brickname='reference',
                           filters=[32, 64, 128],
                           kernels=[4, 5, 6],
