@@ -12,8 +12,9 @@ import time
 from sklearn.feature_extraction import image
 import keras
 from keras.layers import Input, Concatenate, concatenate, Conv2D, Dropout, BatchNormalization, ELU, Activation, PReLU, SpatialDropout2D, LeakyReLU, Multiply, Subtract, Conv2DTranspose, Add
+import matplotlib
 matplotlib.use('agg')
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 import os
 
 
