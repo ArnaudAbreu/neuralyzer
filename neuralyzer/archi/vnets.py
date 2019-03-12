@@ -115,3 +115,105 @@ class Vnet(Brick):
                 self.trainable_weights += self.head.trainable_weights
 
             return y
+
+
+class Vnet_4levels:
+
+    def __init__(self, dropout_rate):
+
+        self.deph = 16
+        self.batch_norm = True
+        self.padding = "same"
+        self.dropout_rate = dropout_rate
+        self.spatialdrop = True
+
+    def __call__(self, inputs):
+
+        # PATCH_DIM
+        Y = Conv2D(self.deph, 5, padding=self.padding, kernel_initializer='he_normal', use_bias=False)(inputs)
+        Y = BatchNormalization()(Y)
+        Y = PReLU()(Y)
+        jump1 = self.drop(Y)
+
+        # PATCH_DIM/2
+        Y = Conv2D(self.deph * 2, 2, padding=self.padding, kernel_initializer='he_normal', strides=(2, 2))(jump1)
+        Down = Activation('relu')(Y)
+        Y = Conv2D(self.deph * 2, 5, padding=self.padding, kernel_initializer='he_normal')(Down)
+        Y = Activation('relu')(Y)
+        Y = self.drop(Y)
+        Y = Conv2D(self.deph * 2, 5, padding=self.padding, kernel_initializer='he_normal')(Y)
+        Y = Activation('relu')(Y)
+        jump2 = self.drop(Y)
+
+        # PATCH_DIM/4
+        Y = Conv2D(self.deph * 4, 2, padding=self.padding, kernel_initializer='he_normal', strides=(2, 2))(Add()([Down, jump2]))
+        Down = Activation('relu')(Y)
+        Y = Conv2D(self.deph * 4, 5, padding=self.padding, kernel_initializer='he_normal')(Down)
+        Y = Activation('relu')(Y)
+        Y = self.drop(Y)
+        Y = Conv2D(self.deph * 4, 5, padding=self.padding, kernel_initializer='he_normal')(Y)
+        Y = self.drop(Y)
+        jump3 = Activation('relu')(Y)
+
+        # PATCH_DIM/8
+        Y = Conv2D(self.deph * 8, 2, padding=self.padding, kernel_initializer='he_normal', strides=(2, 2))(Add()([Down, jump3]))
+        Down = Activation('relu')(Y)
+
+        Y = Conv2D(self.deph * 8, 5, padding=self.padding, kernel_initializer='he_normal')(Down)
+        Y = BatchNormalization()(Y)
+        Y = Activation('relu')(Y)
+        Y = self.drop(Y)
+        Y = Conv2D(self.deph * 8, 5, padding=self.padding, kernel_initializer='he_normal', use_bias=False)(Y)
+        Y = BatchNormalization()(Y)
+        Y = Activation('relu')(Y)
+        Y = self.drop(Y)
+        Y = Add()([Down, Y])
+
+        # PATCH_DIM/4
+        Y = Conv2DTranspose(filters=self.deph * 4, kernel_size=4, strides=2, padding='same', kernel_initializer='he_normal')(Y)
+        Up = Activation('relu')(Y)
+
+        Y = Add()([jump3, Up])
+
+        Y = Conv2D(self.deph * 4, 5, padding=self.padding, kernel_initializer='he_normal')(Y)
+        Y = self.drop(Y)
+        Y = Activation('relu')(Y)
+        Y = Conv2D(self.deph * 4, 5, padding=self.padding, kernel_initializer='he_normal')(Y)
+        Y = self.drop(Y)
+        Y = Activation('relu')(Y)
+
+        Y = Add()([Y, Up])
+
+        # PATCH_DIM/2
+        Y = Conv2DTranspose(filters=self.deph * 2, kernel_size=4, strides=2, padding='same', kernel_initializer='he_normal')(Y)
+        Up = Activation('relu')(Y)
+
+        Y = Add()([jump2, Up])
+
+        Y = Conv2D(self.deph * 2, 5, padding=self.padding, kernel_initializer='he_normal')(Y)
+        Y = self.drop(Y)
+        Y = Activation('relu')(Y)
+        Y = Conv2D(self.deph * 2, 5, padding=self.padding, kernel_initializer='he_normal')(Y)
+        Y = self.drop(Y)
+        Y = Activation('relu')(Y)
+
+        Y = Add()([Y, Up])
+
+        # PATCH_DIM
+        Y = Conv2DTranspose(filters=self.deph, kernel_size=4, strides=2, padding='same', kernel_initializer='he_normal')(Y)
+        Y = PReLU()(Y)
+        Y = Add()([jump1, Y])
+        Y = self.drop(Y)
+        Y = Conv2D(self.deph, 5, padding=self.padding, kernel_initializer='he_normal', use_bias=False)(Y)
+        Y = BatchNormalization()(Y)
+        Y = PReLU()(Y)
+        Y = self.drop(Y)
+        # Y = Conv2D(1, 1, activation = 'sigmoid')(Y)
+
+        return Y
+
+    def drop(self, Y):
+        if self.spatialdrop:
+            return SpatialDropout2D(self.dropout_rate)(Y)
+        else:
+            return Dropout(self.dropout_rate)(Y)
