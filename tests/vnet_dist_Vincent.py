@@ -137,7 +137,7 @@ def weighted_dice_coef_multiD_tf(y_true, y_pred, weight, smooth=1e-5):
     dice = (2. * intersection + smooth) / (tf.reduce_sum(y_true, axis=[0, 1]) + tf.reduce_sum(y_pred, axis=[0, 1]) + smooth)
     wdice = dice * weight
     # sum over channels
-    return tf.reduce_sum(wdice) / tf.reduce_sum(weight)
+    return tf.reduce_sum(wdice)
 
 
 def dice_coef_multiD_tf(y_true, y_pred, smooth=1e-5):
