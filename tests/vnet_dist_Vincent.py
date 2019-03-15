@@ -48,11 +48,19 @@ parser.add_argument("--size", type=int, default=64,
 parser.add_argument("--ncat", type=int, default=12,
                     help="number of categories")
 
+parser.add_argument("-weighted", default='no',
+                    help='is weighting applied on classes in loss')
+
 args = parser.parse_args()
 batchsize = args.batchsize
 epochs = args.epochs
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = args.device
+
+if 'n' in args.weighted.lower():
+    WEIGHTED = False
+else:
+    WEIGHTED = True
 
 
 DIR_FOR_TRAIN = args.outfolder
@@ -124,11 +132,24 @@ def head_classif_multilabel(Y, nbClasses):
     return Conv2D(nbClasses, 1, activation='sigmoid')(Y)
 
 
+def weighted_dice_coef_multiD_tf(y_true, y_pred, weight, smooth=1e-5):
+    intersection = tf.reduce_sum(y_true * y_pred, axis=[0, 1])
+    dice = (2. * intersection + smooth) / (tf.reduce_sum(y_true, axis=[0, 1]) + tf.reduce_sum(y_pred, axis=[0, 1]) + smooth)
+    wdice = dice * weight
+    # sum over channels
+    return tf.reduce_mean(wdice)
+
+
 def dice_coef_multiD_tf(y_true, y_pred, smooth=1e-5):
     intersection = tf.reduce_sum(y_true * y_pred, axis=[0, 1])
     dice = (2. * intersection + smooth) / (tf.reduce_sum(y_true, axis=[0, 1]) + tf.reduce_sum(y_pred, axis=[0, 1]) + smooth)
     # sum over channels
     return tf.reduce_mean(dice)
+
+
+def weighted_dice_loss_multi_D(y_true, y_pred, weight):
+    smooth = 1e-5
+    return 1. - weighted_dice_coef_multiD_tf(y_true, y_pred, weight, smooth)
 
 
 def dice_loss_multi_D(y_true, y_pred):
@@ -142,13 +163,23 @@ def make_model():
 
     Y = Vnet_4levels(memo_train["dropout"])(inputs)
 
+    weight = tf.range(start=memo_train['nb_cat'], limit=0, dtype=tf.float32)
+
     """premier essais: pas terrible!"""
     # output = head_regression(Y)
     # loss = square_loss
 
     # I think that we can reduce the 'nb_cat' because at the end, the model to not recognise all of them
     output = head_classif_multilabel(Y, memo_train["nb_cat"])
-    loss = dice_loss_multi_D
+
+    if WEIGHTED:
+        def m_loss(y_true, y_pred):
+            return weighted_dice_loss_multi_D(y_true, y_pred, weight)
+
+        loss = m_loss
+
+    else:
+        loss = dice_loss_multi_D
 
     memo_train["loss"] = "dice_loss_multi_D"
 
@@ -207,7 +238,7 @@ try:
 
         history = model.fit(X_train_patch,
                             Y_train_patch_cat,
-                            batch_size=28,  # 40
+                            batch_size=args.batchsize,  # 40
                             # initial_epoch=nb_epochs,
                             # epochs=nb_epochs+1,
                             validation_data=(X_test_patch, Y_test_patch_cat)
