@@ -234,9 +234,6 @@ try:
 
         print("epoch nb: " + str(nb_epochs))
 
-        sess = tf.Session()
-        print('weight for the loss: ', sess.run(weight))
-
         X_train_patch, Y_train_patch = getPatchesForOneEpoch(X_train, Y_train)
         Y_train_patch_cat = to_categorical_pacth_overlaping(Y_train_patch, memo_train["nb_cat"])
 
