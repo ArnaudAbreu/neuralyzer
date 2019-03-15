@@ -157,13 +157,14 @@ def dice_loss_multi_D(y_true, y_pred):
     return 1. - dice_coef_multiD_tf(y_true, y_pred, smooth)
 
 
+weight = tf.range(start=memo_train['nb_cat'], limit=0, delta=-1, dtype=tf.float32) / float(memo_train['nb_cat'])
+
+
 def make_model():
 
     inputs = keras.Input(batch_shape=(None, PATCH_DIM, PATCH_DIM, 3))
 
     Y = Vnet_4levels(memo_train["dropout"])(inputs)
-
-    weight = tf.range(start=memo_train['nb_cat'], limit=0, delta=-1, dtype=tf.float32) / float(memo_train['nb_cat'])
 
     """premier essais: pas terrible!"""
     # output = head_regression(Y)
@@ -232,6 +233,9 @@ try:
     for e in range(total_epochs):
 
         print("epoch nb: " + str(nb_epochs))
+
+        sess = tf.Session()
+        print('weight for the loss: ', sess.run(weight))
 
         X_train_patch, Y_train_patch = getPatchesForOneEpoch(X_train, Y_train)
         Y_train_patch_cat = to_categorical_pacth_overlaping(Y_train_patch, memo_train["nb_cat"])
