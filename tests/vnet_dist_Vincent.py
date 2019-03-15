@@ -163,7 +163,7 @@ def make_model():
 
     Y = Vnet_4levels(memo_train["dropout"])(inputs)
 
-    weight = tf.range(start=memo_train['nb_cat'], limit=0, delta=-1, dtype=tf.float32)
+    weight = tf.range(start=memo_train['nb_cat'], limit=0, delta=-1, dtype=tf.float32) / float(memo_train['nb_cat'])
 
     """premier essais: pas terrible!"""
     # output = head_regression(Y)
