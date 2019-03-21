@@ -157,7 +157,7 @@ def dice_loss_multi_D(y_true, y_pred):
     return 1. - dice_coef_multiD_tf(y_true, y_pred, smooth)
 
 
-weight = tf.range(start=memo_train['nb_cat'], limit=0, delta=-1, dtype=tf.float32) / float(memo_train['nb_cat'])
+weight = tf.square(tf.range(start=memo_train['nb_cat'], limit=0, delta=-1, dtype=tf.float32)) / float(memo_train['nb_cat'] * memo_train['nb_cat'])
 
 
 def make_model():
