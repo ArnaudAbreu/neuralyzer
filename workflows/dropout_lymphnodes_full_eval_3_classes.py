@@ -1,6 +1,6 @@
 # coding: utf8
-from neuralyzer.data.lymphnodes import generate
-from neuralyzer.training.dropout_lymphnodes import train
+from neuralyzer.data.lymphnodes import generate_unbalanced_3_class_data
+from neuralyzer.training.dropout_lymphnodes import train_on_3_classes
 from neuralyzer.prediction.dropout_lymphnodes import test, test_dir
 import argparse
 import os
@@ -19,7 +19,13 @@ parser.add_argument("--sizex", type=int, default=125,
 parser.add_argument("--sizey", type=int, default=125,
                     help="int, size of sample on y axis, at level=--level.")
 
-parser.add_argument("--trainratio", type=float, default=0.66,
+parser.add_argument("--trainratiohf", type=float, default=0.66,
+                    help="float, percentage of data to put in training set.")
+
+parser.add_argument("--trainratiolf", type=float, default=0.66,
+                    help="float, percentage of data to put in training set.")
+
+parser.add_argument("--trainratioother", type=float, default=0.66,
                     help="float, percentage of data to put in training set.")
 
 parser.add_argument("--infolder", type=str, help="path to slide folder.")
@@ -71,9 +77,9 @@ labpathfile = os.path.join(args.outfolder, 'labpathlist.p')
 
 
 if 'y' in args.gendata.lower():
-    generate(args.infolder, outpatchfolder, args.trainratio, args.level, args.sizex, args.sizey, args.interval)
+    generate_unbalanced_3_class_data(args.infolder, outpatchfolder, [args.trainratiohf, args.trainratiolf, args.trainratioother], args.level, args.sizex, args.sizey, args.interval)
 if 'y' in args.trainmodel.lower():
-    train(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder)
+    train_on_3_classes(train_folder, valid_folder, args.batchsize, args.sizex, 3, args.epochs, args.device, args.lr, args.opt, network_folder)
 
 if 'y' in args.valid.lower():
     # use validation wsi for testing

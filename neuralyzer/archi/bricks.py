@@ -366,3 +366,17 @@ class Vnet_Ending_Brick(Brick):
                 self.trainable_weights = self.weights()
 
             return y
+
+
+class Encoder(Brick):
+
+    def __init__(self, name, depth, filters, kernels, activations):
+
+        Brick.__init__(self, name)
+
+        for k in range(depth):
+
+            self.ops.append(Conv2D(filters[k], kernels[k], activation=activations[k], padding='same'))
+            self.ops.append(MaxPooling2D(pool_size=(2, 2)))
+
+        self.ops.append(Conv2D(1, 1, padding='same'))

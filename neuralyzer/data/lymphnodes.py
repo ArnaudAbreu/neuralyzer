@@ -131,3 +131,143 @@ def generate(infolder, outfolder, trainratio, level, sizex, sizey, interval):
 
     with open(labpathlistfile, 'wb') as f:
         pickle.dump(labpathlist, f)
+
+
+def generate_3_class_data(infolder, outfolder, trainratio, level, sizex, sizey, interval):
+    """
+    A function to compute train and test images for 'HF', 'LF' and 'OTHER' classes for
+    lymphnodes diagnosis from a folder containing 'LF' and 'HF' subfolders of
+    mrxs files. It extract patches and store test mrxs paths with associated
+    labels for later testing procedure in a 'labpathlist.p' file.
+
+    Arguments:
+        - infolder: str, path to a folder containing subfolders 'HF' and 'LF'
+        folders.
+        - outfolder: str, path to a folder where to store patches.
+        - trainratio: float, ratio of slides to use for training.
+        - level: int, wsi pyramidal level to extract patches.
+        - sizex: int, size of patches on x axis, in pixels at extraction level.
+        - sizey: int, size of patches on y axis, in pixels at extraction level.
+        - interval: int, distance between patch centers, in pixels at extraction level.
+
+    Returns:
+        - Nothing, just generate patches in appropriate folders for later training-
+        testing generation.
+    """
+
+    hf_infolder = os.path.join(infolder, 'HF')
+    lf_infolder = os.path.join(infolder, 'LF')
+    other_infolder = os.path.join(infolder, 'OTHER')
+    labpathlistfolder = os.path.join(outfolder, '..')
+    labpathlistfile = os.path.join(labpathlistfolder, 'labpathlist.p')
+
+    labpathlist = []
+
+    print('HF patches generation:')
+    print('#' * 20)
+    generate_class(hf_infolder,
+                   outfolder,
+                   'HF',
+                   trainratio,
+                   level,
+                   sizex,
+                   sizey,
+                   interval,
+                   labpathlist)
+
+    print('LF patches generation:')
+    print('#' * 20)
+    generate_class(lf_infolder,
+                   outfolder,
+                   'LF',
+                   trainratio,
+                   level,
+                   sizex,
+                   sizey,
+                   interval,
+                   labpathlist)
+
+    print('OTHER patches generation:')
+    print('#' * 20)
+    generate_class(other_infolder,
+                   outfolder,
+                   'OTHER',
+                   trainratio,
+                   level,
+                   sizex,
+                   sizey,
+                   interval,
+                   labpathlist)
+
+    with open(labpathlistfile, 'wb') as f:
+        pickle.dump(labpathlist, f)
+
+
+def generate_unbalanced_3_class_data(infolder, outfolder, trainratios, level, sizex, sizey, interval):
+    """
+    A function to compute train and test images for 'HF', 'LF' and 'OTHER' classes for
+    lymphnodes diagnosis from a folder containing 'LF' and 'HF' subfolders of
+    mrxs files. It extract patches and store test mrxs paths with associated
+    labels for later testing procedure in a 'labpathlist.p' file.
+
+    Arguments:
+        - infolder: str, path to a folder containing subfolders 'HF' and 'LF'
+        folders.
+        - outfolder: str, path to a folder where to store patches.
+        - trainratios: list of float, ratio of slides to use for training for each class.
+        - level: int, wsi pyramidal level to extract patches.
+        - sizex: int, size of patches on x axis, in pixels at extraction level.
+        - sizey: int, size of patches on y axis, in pixels at extraction level.
+        - interval: int, distance between patch centers, in pixels at extraction level.
+
+    Returns:
+        - Nothing, just generate patches in appropriate folders for later training-
+        testing generation.
+    """
+
+    hf_infolder = os.path.join(infolder, 'HF')
+    lf_infolder = os.path.join(infolder, 'LF')
+    other_infolder = os.path.join(infolder, 'OTHER')
+    labpathlistfolder = os.path.join(outfolder, '..')
+    labpathlistfile = os.path.join(labpathlistfolder, 'labpathlist.p')
+
+    labpathlist = []
+
+    print('HF patches generation:')
+    print('#' * 20)
+    generate_class(hf_infolder,
+                   outfolder,
+                   'HF',
+                   trainratios[0],
+                   level,
+                   sizex,
+                   sizey,
+                   interval,
+                   labpathlist)
+
+    print('LF patches generation:')
+    print('#' * 20)
+    generate_class(lf_infolder,
+                   outfolder,
+                   'LF',
+                   trainratios[1],
+                   level,
+                   sizex,
+                   sizey,
+                   interval,
+                   labpathlist)
+
+    print('OTHER patches generation:')
+    print('#' * 20)
+    generate_class(other_infolder,
+                   outfolder,
+                   'OTHER',
+                   trainratios[2],
+                   level,
+                   sizex,
+                   sizey,
+                   interval,
+                   labpathlist)
+
+    with open(labpathlistfile, 'wb') as f:
+        pickle.dump(labpathlist, f)
