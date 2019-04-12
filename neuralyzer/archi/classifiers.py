@@ -204,3 +204,38 @@ class ClassifierAccumulator(Brick):
             op_list.append(wswa.assign(w))
 
         return op_list
+
+
+class MultiResClassifier(Brick):
+
+    def __init__(self, levels, depth, filters, kernels, activations, brickname='classifier'):
+
+        Brick.__init__(self, brickname=brickname)
+
+        self.encoders = dict()
+
+        for level in levels:
+            self.encoders[level] = Encoder('encoder_' + str(level), depth, filters, kernels, activations)
+
+        self.ops = [self.encoders[level] for level in levels]
+
+    def __call__(self, x):
+
+        """
+        In that particular case, x is a dictionary and its keys are levels.
+        """
+
+        # x[level] should be a list of placeholders
+        ylist = []
+
+        for level in self.encoders.keys():
+            inputs = x[level]
+            ylocallist = [self.encoders[level](xin) for xin in inputs]
+            ylist += ylocallist
+
+        y = tf.concat(ylist, -1)
+
+        if not self.trainable_weights:
+            self.trainable_weights = self.weights()
+
+        return y
