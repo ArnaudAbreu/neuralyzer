@@ -1,7 +1,7 @@
 # coding: utf8
 from neuralyzer.data.lymphnodes import generate_unbalanced_3_class_data
 from neuralyzer.training.dropout_lymphnodes import train_on_3_classes
-from neuralyzer.prediction.dropout_lymphnodes import test, test_dir
+from neuralyzer.prediction.dropout_lymphnodes_3_classes import test, test_dir
 import argparse
 import os
 
