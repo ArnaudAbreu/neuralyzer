@@ -530,3 +530,5 @@ def dropout_predict_slides_from_dir_with_tree(my_models, dirname, outputdir, lev
                 pickle.dump({'predictions': patchtree.predictions, 'variances': patchtree.variances}, f)
 
             my_model.close()
+
+            del my_model
