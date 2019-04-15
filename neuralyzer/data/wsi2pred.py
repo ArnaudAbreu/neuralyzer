@@ -4,6 +4,7 @@ import os
 from skimage.io import imsave
 from tqdm import trange, tqdm
 from .patch import patches_in_slide
+from pysliderois.tissue import PatchTree
 
 
 def predict_slides(my_model, slidedir, outputdir, maxfiles=None, prediction_level=2, h_input=125, w_input=125, rescale=(1. / 255.), offsets=[(0, 0)], n_classes=3):
@@ -385,14 +386,13 @@ def dropout_predict_slides_from_dir(my_model, dirname, outputdir, patch_level, i
 
     """
     Same function as above, take a slide dir and predict every tile of every
-    slide in that dir. It put every results in an outputdir.
+    slide in that dir. It puts every results in an outputdir.
     This function takes advantage of the slight code written in the module patch.
-    It takes a list of filepaths, not a slide dir.
 
     Arguments:
         - my_model: classifier, object with a predict function that works on
         RGB-images.
-        - labpathlist: list of tuples (str, str), absolute path to slides, with GT label.
+        - dirname: str, absolute path to a directory containing mrxs slides.
         - outputdir: str, absolute path to output directory.
         - patch_level: int, level to extract patches, 0 = highest resolution.
         - interval: int, number of pixels between two samples given at patch level.
@@ -445,3 +445,88 @@ def dropout_predict_slides_from_dir(my_model, dirname, outputdir, patch_level, i
 
         with open(outfile, 'wb') as f:
             pickle.dump(outputdata, f)
+
+
+def dropout_predict_patch_tree(my_model, patchtree, level):
+
+    """
+    Function to predict tiles from a patchtree. The patchtree is a pysliderois object.
+    It has a hierarchical structure and generators to yield batch of patches.
+    One should store prediction results inside the patchtree structure.
+
+    Arguments:
+        - my_model: classifier, object with a predict function that works on
+        RGB-images.
+        - patchtree: PatchTree object from pysliderois.
+        - level: level to extract patches.
+    """
+
+    for patchbatch in patchtree.images_at_level(level):
+
+        relpos, abspos, images = patchbatch
+
+        preds = my_model.predict(images)
+
+        for n in range(abspos):
+
+            locpreds = numpy.array([p[0][n] for p in preds])
+
+            patchtree.predictions[abspos[n]] = numpy.mean(locpreds, axis=0)
+
+            patchtree.variances[abspos[n]] = numpy.var(locpreds, axis=0)[0]
+
+
+def dropout_predict_slides_from_dir_with_tree(my_models, dirname, outputdir, levelmax, levelmin):
+
+    """
+    Same function as above, take a slide dir and predict every tile of every
+    slide in that dir. It puts every results in an outputdir.
+    This function takes advantage of a complex code written in the package
+    pysliderois for hierarchical patch computation.
+
+    Arguments:
+        - my_models: objects with a load function that works on to load trained
+        classifiers that work on RGB-images.
+        - dirname: str, absolute path to a directory containing mrxs slides.
+        - outputdir: str, absolute path to output directory.
+    """
+
+    from openslide import OpenSlide
+
+    k = 0
+
+    namelist = [name for name in os.listdir(dirname) if '.mrxs' in name and name[0] != '.']
+    pathlist = [os.path.join(dirname, name) for name in namelist]
+
+    # for each slide
+    for path in pathlist:
+
+        k += 1
+
+        # inform user
+        print('#' * 20)
+        print('Processing file: ', path)
+        print('progression : ', (k / len(pathlist)) * 100, '%')
+        print('#' * 20)
+
+        slide = OpenSlide(path)
+
+        # create a patch tree (pysliderois object)
+        patchtree = PatchTree(slide, my_model.h_input, levelmax, levelmin)
+
+        # for each level in the patch tree
+        for n in range(patchtree.levelmin, patchtree.levelmax + 1):
+
+            # instanciate a model
+            my_model = my_models.load_level(n)
+
+            # predict with the model
+            dropout_predict_patch_tree(my_model, patchtree, n)
+
+            # store the patchtree
+            outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_patchtree.p")
+
+            with open(outfile, 'wb') as f:
+                pickle.dump(patchtree, f)
+
+            my_model.close()
