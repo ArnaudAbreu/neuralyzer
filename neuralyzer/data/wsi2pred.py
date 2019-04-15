@@ -527,6 +527,6 @@ def dropout_predict_slides_from_dir_with_tree(my_models, dirname, outputdir, lev
             outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_patchtree.p")
 
             with open(outfile, 'wb') as f:
-                pickle.dump(patchtree, f)
+                pickle.dump({'predictions': patchtree.predictions, 'variances': patchtree.variances}, f)
 
             my_model.close()
