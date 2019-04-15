@@ -33,6 +33,13 @@ class ModelCollection:
 
     def __init__(self, modeldirs):
 
+        self.modeldirs = modeldirs
+        self.patchsize = 125
+
+    def load_level(self, level):
+
+        basenet = os.path.join(self.modeldirs[level], 'model.ckpt')
+
         self.archi = Classifier(brickname='reference',
                                 filters=[32, 64, 128],
                                 kernels=[4, 5, 6],
@@ -45,14 +52,13 @@ class ModelCollection:
                                 end_activation='softmax',
                                 output_channels=2)
 
-        self.modeldirs = modeldirs
-        self.patchsize = 125
+        self.clf = CCLF(self.archi, height=125, width=125, colors=3, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD", sampling=100)
 
-    def load_level(self, level):
+    def close_level(self):
 
-        basenet = os.path.join(self.modeldirs[level], 'model.ckpt')
+        self.clf.close()
 
-        return CCLF(self.archi, height=125, width=125, colors=3, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD", sampling=100)
+        del self.clf, self.archi
 
 
 my_models = ModelCollection(modeldirs)
