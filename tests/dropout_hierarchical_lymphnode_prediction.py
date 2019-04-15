@@ -10,6 +10,16 @@ import argparse
 import os
 import pickle
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--device", default="0",
+                    help="device to use for computation")
+
+args = parser.parse_args()
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = args.device
+
 parentdir = '/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte'
 
 modeldirs = {k: os.path.join(os.path.join(parentdir, 'DropClassifP' + str(k)), 'Model') for k in range(4, 8)}
