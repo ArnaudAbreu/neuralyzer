@@ -518,10 +518,10 @@ def dropout_predict_slides_from_dir_with_tree(my_models, dirname, outputdir, lev
         for n in range(levelmin, levelmax + 1):
 
             # instanciate a model
-            my_model = my_models.load_level(n)
+            my_models.load_level(n)
 
             # predict with the model
-            dropout_predict_patch_tree(my_model.clf, patchtree, n)
+            dropout_predict_patch_tree(my_models.clf, patchtree, n)
 
             # store the patchtree
             outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_patchtree.p")
