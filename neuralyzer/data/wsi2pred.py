@@ -512,10 +512,10 @@ def dropout_predict_slides_from_dir_with_tree(my_models, dirname, outputdir, lev
         slide = OpenSlide(path)
 
         # create a patch tree (pysliderois object)
-        patchtree = PatchTree(slide, my_model.h_input, levelmax, levelmin)
+        patchtree = PatchTree(slide, my_models.patchsize, levelmax, levelmin)
 
         # for each level in the patch tree
-        for n in range(patchtree.levelmin, patchtree.levelmax + 1):
+        for n in range(levelmin, levelmax + 1):
 
             # instanciate a model
             my_model = my_models.load_level(n)

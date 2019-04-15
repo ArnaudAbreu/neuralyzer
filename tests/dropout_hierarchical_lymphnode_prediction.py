@@ -46,6 +46,7 @@ class ModelCollection:
                                 output_channels=2)
 
         self.modeldirs = modeldirs
+        self.patchsize = 125
 
     def load_level(self, level):
 
