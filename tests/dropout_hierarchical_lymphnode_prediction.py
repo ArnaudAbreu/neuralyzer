@@ -50,7 +50,7 @@ class ModelCollection:
 
     def load_level(self, level):
 
-        basenet = os.path.join(self.modeldirs[k], 'model.ckpt')
+        basenet = os.path.join(self.modeldirs[level], 'model.ckpt')
 
         return CCLF(self.archi, height=125, width=125, colors=3, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD", sampling=100)
 
