@@ -465,7 +465,9 @@ def dropout_predict_patch_tree(my_model, patchtree, level):
 
         relpos, abspos, images = patchbatch
 
-        preds = my_model.predict(images)
+        im2predict = [i.astype(float) / 255. for i in images]
+
+        preds = my_model.predict(im2predict)
 
         for n in range(len(abspos)):
 
