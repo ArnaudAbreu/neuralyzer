@@ -15,6 +15,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--device", default="0",
                     help="device to use for computation")
 
+parser.add_argument("--inputdir", type=str, help="path to slide folder.")
+
+parser.add_argument("--outputdir", type=str, help="path to output folder.")
+
 args = parser.parse_args()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -24,9 +28,9 @@ parentdir = '/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte'
 
 modeldirs = {k: os.path.join(os.path.join(parentdir, 'DropClassifP' + str(k)), 'Model') for k in range(4, 8)}
 
-outputdir = '/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte/Preds4to7TreeFashion'
+# outputdir = '/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte/Preds4to7TreeFashion'
 
-dirnames = ['/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte/LF3', '/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte/HF3']
+# dirnames = ['/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte/LF3', '/data/DeepLearning/ABREU_Arnaud/SYRYKH_Charlotte/HF3']
 
 
 class ModelCollection:
@@ -63,5 +67,4 @@ class ModelCollection:
 
 my_models = ModelCollection(modeldirs)
 
-dropout_predict_slides_from_dir_with_tree(my_models, dirnames[0], outputdir, 7, 4)
-dropout_predict_slides_from_dir_with_tree(my_models, dirnames[1], outputdir, 7, 4)
+dropout_predict_slides_from_dir_with_tree(my_models, args.inputdir, args.outputdir, 7, 4)
