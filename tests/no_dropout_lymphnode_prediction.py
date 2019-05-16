@@ -1,6 +1,6 @@
 # coding: utf8
 
-from neuralyzer.data.wsi2pred import dropout_predict_slides_from_dir_with_tree, dropout_predict_slides_from_labpathlist_with_tree
+from neuralyzer.data.wsi2pred import dropout_predict_slides_from_dir
 from neuralyzer.model import CCLF
 from neuralyzer.archi import Classifier
 from neuralyzer.render import monitor
@@ -20,6 +20,12 @@ parser.add_argument("--inputdir", type=str, help="path to slide folder.")
 parser.add_argument("--labpathdir", default="None", type=str, help="path to a folder containing labpath file.")
 
 parser.add_argument("--outputdir", type=str, help="path to output folder.")
+
+parser.add_argument("--level", type=int, help="level of classifier to use.",
+                    default=5)
+
+parser.add_argument("--interval", type=int, help="interval between two patches at patch level.",
+                    default=62)
 
 args = parser.parse_args()
 
@@ -52,13 +58,13 @@ class ModelCollection:
                                 strides=[1, 1, 1],
                                 dropouts=[0., 0., 0.],
                                 fc=[1024, 1024],
-                                fcdropouts=[0.5, 0.5],
+                                fcdropouts=[0., 0.],
                                 conv_activations=['relu', 'relu', 'relu'],
                                 fc_activations=['relu', 'relu'],
                                 end_activation='softmax',
                                 output_channels=2)
 
-        self.clf = CCLF(self.archi, height=125, width=125, colors=3, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD", sampling=100)
+        self.clf = CCLF(self.archi, height=125, width=125, colors=3, n_classes=2, learning_rate=0.001, model_path=basenet, optimizer="SGD", sampling=1)
 
     def close_level(self):
 
@@ -69,4 +75,10 @@ class ModelCollection:
 
 my_models = ModelCollection(modeldirs)
 
-dropout_predict_slides_from_dir_with_tree(my_models, args.inputdir, args.outputdir, 7, 4)
+# dropout_predict_slides_from_dir_with_tree(my_models, args.inputdir, args.outputdir, 7, 4)
+
+my_models.load_level(args.level)
+
+dropout_predict_slides_from_dir(my_models.clf, args.inputdir, args.outputdir, args.level, args.interval, 125, 125, maxfiles=None)
+
+my_models.close_level()

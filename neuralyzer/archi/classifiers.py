@@ -98,7 +98,7 @@ class Classifier(Brick):
                                    activation=opac,
                                    padding='same',
                                    name=opname))
-            self.ops.append(MaxPooling2D(pool_size=(2, 2), name="pool"))
+            self.ops.append(MaxPooling2D(pool_size=(2, 2), name=poolname))
             self.ops.append(Dropout(rate=opdropout, name=dropname))
 
         # Before applying fully connected layers, I have to flatten

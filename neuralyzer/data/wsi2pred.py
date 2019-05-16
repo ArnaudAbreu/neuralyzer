@@ -532,3 +532,51 @@ def dropout_predict_slides_from_dir_with_tree(my_models, dirname, outputdir, lev
                 pickle.dump({'predictions': patchtree.predictions, 'variances': patchtree.variances, 'warnings': patchtree.warnings, 'tree': patchtree.children}, f)
 
             my_models.close_level()
+
+
+def dropout_predict_slides_from_labpathlist_with_tree(my_models, labpathlist, outputdir, levelmax, levelmin):
+
+    """
+    """
+
+    from openslide import OpenSlide
+
+    k = 0
+
+    # namelist = [name for name in os.listdir(dirname) if '.mrxs' in name and name[0] != '.']
+    # pathlist = [os.path.join(dirname, name) for name in namelist]
+
+    # for each slide
+    for labpath in labpathlist:
+
+        path, lab = labpath
+
+        k += 1
+
+        # inform user
+        print('#' * 20)
+        print('Processing file: ', path)
+        print('progression : ', (k / len(labpathlist)) * 100, '%')
+        print('#' * 20)
+
+        slide = OpenSlide(path)
+
+        # create a patch tree (pysliderois object)
+        patchtree = PatchTree(slide, my_models.patchsize, levelmax, levelmin)
+
+        # for each level in the patch tree
+        for n in range(levelmin, levelmax + 1):
+
+            # instanciate a model
+            my_models.load_level(n)
+
+            # predict with the model
+            dropout_predict_patch_tree(my_models.clf, patchtree, n)
+
+            # store the patchtree
+            outfile = os.path.join(outputdir, os.path.basename(path).split(".")[0] + "_patchtree.p")
+
+            with open(outfile, 'wb') as f:
+                pickle.dump({'predictions': patchtree.predictions, 'variances': patchtree.variances, 'warnings': patchtree.warnings, 'tree': patchtree.children}, f)
+
+            my_models.close_level()
