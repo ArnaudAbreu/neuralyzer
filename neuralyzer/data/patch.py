@@ -255,8 +255,8 @@ def patchify(slide, patch_level, interval, x_size, y_size, prefix):
 
         if not is_low_contrast(image[:, :, 0:3]):
 
-            name = prefix + "_" + str(x) + "_" + str(y) + ".png"
+            outpath = prefix + "_" + str(x) + "_" + str(y) + ".png"
 
-            outpath = os.path.join(prefix, name)
+            # outpath = os.path.join(prefix, name)
 
             imsave(outpath, image[:, :, 0:3])
