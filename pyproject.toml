@@ -20,7 +20,8 @@ dependencies = [
     "torchvision",
     "numpy",
     "pandas",
-    "matplotlib"
+    "matplotlib",
+    "scikit-image"
 ]
 
 [project.scripts]
