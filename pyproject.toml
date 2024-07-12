@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["neuralyzer*"]
+exclude = ["docs*", "tests*", "workflows*"]
+
+[project]
+name = "neuralyzer"
+version = "0.0.1"
+authors = [
+    {name = "Arnaud Abreu", email = "arnaud.abreu.p@gmail.com"}
+]
+description = "A package with AI utils functions and classes."
+readme = "README.md"
+keywords = []
+dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "pandas",
+    "matplotlib"
+]
+
+[project.scripts]
