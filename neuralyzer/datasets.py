@@ -1,10 +1,10 @@
+from typing import Callable, Iterator, Optional, Tuple
+
 import numpy as np
 import torch
 from skimage.color import rgb2gray
 from skimage.io import imread
 from torch.utils.data import DataLoader, Dataset
-from typing import Callable, Iterator, Optional, Tuple
-from torchvision.transforms import Compose
 
 
 def load_gray_image(path: str) -> np.ndarray:
@@ -51,25 +51,24 @@ def sample_grid(height: int, width: int, stride: int) -> Iterator[Tuple[int, int
     return [(i, j) for i in y for j in x]
 
 
-class PatchToTensor(object):
+class GrayPatchToFlatTensor(object):
     """
     Convert ndarrays in sample to Tensors.
     """
     
-    def __init__(self, device: Optional[torch.device] = None, is_gray: bool = False):
+    def __init__(self, device: Optional[torch.device] = None):
         """
-        Initialize the ToTensor transform.
+        Initialize the GrayPatchToFlatTensor transform.
         
         Args:
             device (torch.device): The device to store the tensor.
             is_gray (bool): Whether the input is grayscale
         """
         self.device = device
-        self.is_gray = is_gray
     
     def __call__(self, sample: np.ndarray) -> torch.Tensor:
         """
-        Call method of the ToTensor transform.
+        Transform a gray patch to a flat torch tensor.
         
         Args:
             sample (np.ndarray): The input sample.
@@ -77,15 +76,12 @@ class PatchToTensor(object):
         Returns:
             torch.Tensor: The output tensor.
         """
-        result = torch.tensor(sample, dtype=torch.float32, device=self.device)
-        if self.is_gray:
-            result = result.unsqueeze(0)
-        else:
-            result = result.permute(2, 0, 1)
+        flat = sample.flatten()
+        result = torch.tensor(flat, dtype=torch.float32, device=self.device)
         return result
 
 
-class PatchDataset_(Dataset):
+class PatchDataset(Dataset):
     """
     A dataset that generates patches from an image.
     """
@@ -94,8 +90,8 @@ class PatchDataset_(Dataset):
         img: np.ndarray,
         patch_size: int,
         stride: int,
-        transform: Optional[Callable] = None,
-        shuffle: bool = True
+        shuffle: bool = True,
+        transform: Optional[Callable] = None
     ):
         """
         Initialize the PatchDataset.
@@ -118,14 +114,18 @@ class PatchDataset_(Dataset):
             img.shape[1] - patch_size,
             stride
         )
-        if shuffle:
-            np.random.shuffle(self.grid)
+        self.shuffle = shuffle
+        self.shuffle_indices = np.arange(len(self.grid))
+        np.random.shuffle(self.shuffle_indices)
 
     def __len__(self):
         return len(self.grid)
 
     def __getitem__(self, idx):
-        y, x = self.grid[idx]
+        real_idx = idx
+        if self.shuffle:
+            real_idx = self.shuffle_indices[idx]
+        y, x = self.grid[real_idx]
         patch = self.img[
             y:y + self.patch_size,
             x:x + self.patch_size
@@ -133,9 +133,26 @@ class PatchDataset_(Dataset):
         if self.transform:
             patch = self.transform(patch)
         return {"image": patch, "position": (y, x)}
+    
+    def loc(self, x: int, y: int) -> np.ndarray:
+        """
+        Get the patch at a specific location.
+        
+        Args:
+            x (int): The x coordinate of the patch.
+            y (int): The y coordinate of the patch.
+        
+        Returns:
+            np.ndarray: The patch.
+        """
+        patch = self.img[
+            y:y + self.patch_size,
+            x:x + self.patch_size
+        ]
+        return patch
 
 
-class GrayPatchDataset(object):
+class FlatGrayPatchDataset(object):
     """
     A patch data loader.
     """
@@ -153,7 +170,9 @@ class GrayPatchDataset(object):
         Args:
             patch_size (int): The size of the patch.
             stride (int): The stride of the patch.
-            transform (PatchToTensor): The transform to apply to the patches.
+            batch_size (int): The batch size.
+            shuffle (bool): Whether to shuffle the patches.
+            device (torch.device): The device to store the tensor.
         """
         self.patch_size = patch_size
         self.stride = stride
@@ -172,17 +191,18 @@ class GrayPatchDataset(object):
             DataLoader: The patch dataset.
         """
         img = load_gray_image(img_path)
-        dataset = PatchDataset_(
+        dataset = PatchDataset(
             img=img,
             patch_size=self.patch_size,
             stride=self.stride,
-            transform=PatchToTensor(is_gray=True, device=self.device),
+            transform=GrayPatchToFlatTensor(device=self.device),
             shuffle=self.shuffle
         )
         loader = DataLoader(
             dataset,
             batch_size=self.batch_size,
-            shuffle=self.shuffle
+            shuffle=self.shuffle,
+            
         )
         return loader
     
