@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from skimage.color import rgb2gray
 from skimage.io import imread
+from skimage.util import img_as_float
 from torch.utils.data import DataLoader, Dataset
 
 
@@ -19,6 +20,36 @@ def load_gray_image(path: str) -> np.ndarray:
     """
     img = imread(path)
     return rgb2gray(img)
+
+
+def load_rgb_image(path: str) -> np.ndarray:
+    """
+    Load an image from a file and convert it to RGB.
+    
+    Args:
+        path (str): The path to the image file.
+    
+    Returns:
+        np.ndarray: The RGB image.
+    """
+    img = imread(path)
+    return img_as_float(img)
+
+
+def load_image(path: str, gray: bool = False) -> np.ndarray:
+    """
+    Load an image from a file.
+    
+    Args:
+        path (str): The path to the image file.
+        gray (bool): Whether to convert the image to grayscale.
+    
+    Returns:
+        np.ndarray: The image.
+    """
+    if gray:
+        return load_gray_image(path)
+    return load_rgb_image(path)
 
 
 def sample_line(size: int, stride: int) -> np.ndarray:
@@ -51,7 +82,7 @@ def sample_grid(height: int, width: int, stride: int) -> Iterator[Tuple[int, int
     return [(i, j) for i in y for j in x]
 
 
-class GrayPatchToFlatTensor(object):
+class PatchToFlatTensor(object):
     """
     Convert ndarrays in sample to Tensors.
     """
@@ -152,7 +183,7 @@ class PatchDataset(Dataset):
         return patch
 
 
-class FlatGrayPatchDataset(object):
+class FlatPatchDataset(object):
     """
     A patch data loader.
     """
@@ -180,22 +211,26 @@ class FlatGrayPatchDataset(object):
         self.shuffle = shuffle
         self.device = device
     
-    def load(self, img_path: str) -> DataLoader:
+    def load(
+        self,
+        img_path: str,
+        gray: bool = False) -> DataLoader:
         """
         Load the image and create the patch dataset.
         
         Args:
             img_path (str): The path to the image.
+            gray (bool): Whether the image is grayscale.
         
         Returns:
             DataLoader: The patch dataset.
         """
-        img = load_gray_image(img_path)
+        img = load_image(img_path, gray=gray)
         dataset = PatchDataset(
             img=img,
             patch_size=self.patch_size,
             stride=self.stride,
-            transform=GrayPatchToFlatTensor(device=self.device),
+            transform=PatchToFlatTensor(device=self.device),
             shuffle=self.shuffle
         )
         loader = DataLoader(
